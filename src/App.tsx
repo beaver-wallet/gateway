@@ -6,7 +6,10 @@ import {
 import { Subscribe } from "./Subscribe";
 import { WagmiConfig } from "wagmi";
 import { Home } from "./Home";
-import { defaultWagmiConfig } from "@web3modal/wagmi/react";
+import {
+  createWeb3Modal,
+  defaultWagmiConfig,
+} from "@web3modal/wagmi/react";
 import { SupportedChains } from "./types";
 
 // Wallet connect project id
@@ -27,6 +30,13 @@ export const wagmiConfig = defaultWagmiConfig({
   chains: SupportedChains,
   projectId,
   metadata,
+});
+
+createWeb3Modal({
+  wagmiConfig,
+  projectId,
+  chains: SupportedChains,
+  defaultChain: SupportedChains[0],
 });
 
 function App() {

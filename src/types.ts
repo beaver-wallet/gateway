@@ -1,31 +1,97 @@
+import { Hex } from "viem";
 import {
-  base,
   polygon,
   mainnet,
   sepolia,
-  baseGoerli,
-  arbitrum,
-  arbitrumGoerli,
 } from "wagmi/chains";
 
 export type SupportedChain =
   | typeof mainnet
-  | typeof base
   | typeof polygon
-  | typeof sepolia
-  | typeof baseGoerli
-  | typeof arbitrum
-  | typeof arbitrumGoerli;
+  | typeof sepolia;
 
 export const SupportedChains = [
   mainnet,
-  base,
   polygon,
   sepolia,
-  baseGoerli,
-  arbitrum,
-  arbitrumGoerli,
 ];
+
+export const ValidPeriods = [
+  "min",
+  "day",
+  "week",
+  "month",
+  "year",
+];
+
+export type Period =
+  (typeof ValidPeriods)[number];
 
 export const SupportedChainIds =
   SupportedChains.map((chain) => chain.id);
+
+export const RouterAddress =
+  "0x34207C538E39F2600FE672bB84A90efF190ae4C7";
+
+export interface SubscriptionPrompt {
+  merchantDomain: string;
+  merchantAddress: Hex;
+  product: string;
+  tokenSymbol: string;
+  amount: number;
+  period: Period;
+  availableChains: SupportedChain[];
+}
+
+export interface RequiredSearchParams {
+  product: string;
+  token: string;
+  amount: string;
+  period: string;
+  chains: string;
+  domain: string;
+}
+
+export const ChainsSettings = {
+  [mainnet.id]: {
+    tokens: {
+      USDT: {
+        address:
+          "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+        decimals: 6,
+      },
+      LUSD: {
+        address:
+          "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
+        decimals: 18,
+      },
+    },
+  },
+  [polygon.id]: {
+    tokens: {
+      USDT: {
+        address: "",
+        decimals: 0,
+      },
+      LUSD: {
+        address:
+          "0x23001f892c0c82b79303edc9b9033cd190bb21c7",
+        decimals: 18,
+      },
+    },
+  },
+  [sepolia.id]: {
+    tokens: {
+      USDT: {
+        address:
+          "0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0",
+        decimals: 6,
+      },
+      AAVE: {
+        address:
+          "0xD3B304653E6dFb264212f7dd427F9E926B2EaA05",
+        decimals: 18,
+      },
+    },
+  },
+};

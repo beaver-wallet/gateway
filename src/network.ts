@@ -1,4 +1,16 @@
-import { Hex, getAddress } from "viem";
+import {
+  Hex,
+  createPublicClient,
+  getAddress,
+  getContract,
+  http,
+} from "viem";
+import {
+  ChainsSettings,
+  RouterAddress,
+  SupportedChain,
+} from "./types";
+import { erc20ABI } from "wagmi";
 
 const BeaverDnsKey = "beaver-address=";
 
@@ -38,4 +50,34 @@ export async function resolveDomainToAddress(
   } catch (e) {
     return undefined;
   }
+}
+
+// Returns current allowance for the given token. In human readable format.
+export async function queryCurrentAllowance(
+  chain: SupportedChain,
+  tokenSymbol: string,
+  userAddress: Hex
+): Promise<number> {
+  const client = createPublicClient({
+    chain: chain,
+    transport: http(),
+  });
+
+  const tokenProps =
+    ChainsSettings[chain.id].tokens[
+      tokenSymbol as keyof (typeof ChainsSettings)[typeof chain.id]["tokens"]
+    ];
+
+  const contract = getContract({
+    address: tokenProps.address as Hex,
+    abi: erc20ABI,
+    publicClient: client,
+  });
+
+  const allowance = await contract.read.allowance(
+    [userAddress, RouterAddress]
+  );
+  return (
+    Number(allowance) / 10 ** tokenProps.decimals
+  );
 }
