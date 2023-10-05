@@ -1,25 +1,47 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+} from "react-router-dom";
+import { Subscribe } from "./Subscribe";
+import { WagmiConfig } from "wagmi";
+import { Home } from "./Home";
+import { defaultWagmiConfig } from "@web3modal/wagmi/react";
+import { SupportedChains } from "./types";
+
+// Wallet connect project id
+export const projectId =
+  "e73fed4f49cb7c0d4ab26cf055465dcc";
+
+export const metadata = {
+  name: "Beaver Subscriptions Gateway",
+  description:
+    "Beaver Subscriptions Gateway - an easy way to pay for subscriptions with crypto",
+  url: "https://gateway.ethbeaver.xyz",
+  icons: [
+    "https://avatars.githubusercontent.com/u/37784886",
+  ],
+};
+
+export const wagmiConfig = defaultWagmiConfig({
+  chains: SupportedChains,
+  projectId,
+  metadata,
+});
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <WagmiConfig config={wagmiConfig}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/subscribe"
+            element={<Subscribe />}
+          />
+        </Routes>
+      </BrowserRouter>
+    </WagmiConfig>
   );
 }
 
