@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   queryCurrentAllowance,
+  queryCurrentBalance,
   resolveDomainToAddress,
 } from "./network";
 import {
@@ -11,7 +12,6 @@ import {
   SupportedChain,
   SupportedChainIds,
   SupportedChains,
-  ValidPeriods,
 } from "./types";
 import {
   erc20ABI,
@@ -24,10 +24,8 @@ import {
 } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { TestSubscribeSearchParams } from "./TestData";
-import {
-  encodeAbiParameters,
-  encodeFunctionData,
-} from "viem";
+import { encodeFunctionData } from "viem";
+import { RouterABI } from "./abi";
 
 function CoreFrame(props: {
   title: string;
@@ -68,10 +66,11 @@ function CoreFrame(props: {
   );
 }
 
-function ApproveButton(props: {
+function TransactionButton(props: {
   prompt: SubscriptionPrompt;
   chain: SupportedChain;
-  onSuccessfulApprove: () => void;
+  onExecuted: () => void;
+  buttonType: "approve" | "start";
 }) {
   const tokenProps =
     ChainsSettings[props.chain.id].tokens[
@@ -79,19 +78,46 @@ function ApproveButton(props: {
         .tokenSymbol as keyof (typeof ChainsSettings)[typeof props.chain.id]["tokens"]
     ];
 
-  const { config } = usePrepareSendTransaction({
-    to: tokenProps.address,
-    value: BigInt(0),
-    data: encodeFunctionData({
-      abi: erc20ABI as any,
-      functionName: "approve",
-      args: [
-        RouterAddress,
-        props.prompt.amount *
-          10 ** tokenProps.decimals,
-      ],
-    }),
-  });
+  let txData;
+  if (props.buttonType === "approve") {
+    txData = {
+      to: tokenProps.address,
+      value: BigInt(0),
+      data: encodeFunctionData({
+        abi: erc20ABI as any,
+        functionName: "approve",
+        args: [
+          RouterAddress,
+          props.prompt.amount *
+            10 ** tokenProps.decimals *
+            1000,
+        ],
+      }),
+    };
+  } else {
+    txData = {
+      to: RouterAddress,
+      value: BigInt(0),
+      data: encodeFunctionData({
+        abi: RouterABI as any,
+        functionName: "startSubscription",
+        args: [
+          props.prompt.merchantAddress,
+          props.prompt.merchantDomain,
+          "0x" + "1".repeat(64), // random
+          tokenProps.address,
+          props.prompt.amount *
+            10 ** tokenProps.decimals,
+          props.prompt.periodSeconds, // Billing cycle length
+          0, // Free trial length
+          60 * 60 * 24 * 365, // Period to make a single payment. TODO: change. For development purposes only!
+        ],
+      }),
+    };
+  }
+
+  const { config } =
+    usePrepareSendTransaction(txData);
 
   const sendHook = useSendTransaction(config);
 
@@ -100,37 +126,43 @@ function ApproveButton(props: {
   });
 
   if (sendHook.isLoading) {
-    return <p>Approving...</p>;
+    return (
+      <p>
+        {props.buttonType === "approve"
+          ? "Approving..."
+          : "Starting..."}
+      </p>
+    );
   }
   if (sendHook.isSuccess) {
     if (waitHook.isLoading) {
       return <p>Waiting for execution...</p>;
     }
     if (waitHook.isSuccess) {
-      props.onSuccessfulApprove();
-      return <p>Approved!</p>;
+      props.onExecuted();
+      return (
+        <p>
+          Success! Redirecting you back to the
+          merchant!
+        </p>
+      );
     }
   }
   if (sendHook.error) {
-    return (
-      <p>
-        Error occured while approving:{" "}
-        {sendHook.error.message}
-      </p>
-    );
+    return <p>Error: {sendHook.error.message}</p>;
   }
 
+  const buttonText =
+    props.buttonType === "approve"
+      ? `Approve ${props.prompt.tokenSymbol}`
+      : "Start the subscription";
   return (
     <button
       onClick={() => sendHook.sendTransaction!()}
     >
-      Approve {props.prompt.tokenSymbol}
+      {buttonText}
     </button>
   );
-}
-
-function StartButton() {
-  return <button>Start the subscription</button>;
 }
 
 function PayButton(props: {
@@ -142,6 +174,12 @@ function PayButton(props: {
   const userAccount = useAccount();
   const [hasJustApproved, setHasJustApproved] =
     useState<boolean>(false);
+  const [
+    hasStartedSubscription,
+    setHasStartedSubscription,
+  ] = useState<boolean>(false);
+  const [userBalance, setUserBalance] =
+    useState<number>();
 
   const updateAllowance = async () => {
     if (
@@ -159,40 +197,101 @@ function PayButton(props: {
     setAllowance(allowance);
   };
 
+  const updateBalance = async () => {
+    if (
+      !userAccount ||
+      !chain ||
+      !userAccount.address
+    )
+      return;
+
+    const balance = await queryCurrentBalance(
+      chain as SupportedChain,
+      props.prompt.tokenSymbol,
+      userAccount.address
+    );
+    setUserBalance(balance);
+  };
+
   useEffect(() => {
     updateAllowance();
+    updateBalance();
   }, [
     userAccount,
     chain,
     props.prompt.tokenSymbol,
   ]);
 
-  if (allowance === undefined) return <div />;
+  if (
+    allowance === undefined ||
+    userBalance === undefined
+  )
+    return <p>Loading...</p>;
+
+  if (props.prompt.amount > userBalance) {
+    return [
+      <p key={0} style={{ marginBottom: 8 }}>
+        Your current balance is {userBalance}{" "}
+        {props.prompt.tokenSymbol}. You need to
+        hold at least {props.prompt.amount}{" "}
+        {props.prompt.tokenSymbol} to start the
+        subscription.
+      </p>,
+      <button key={1} onClick={updateBalance}>
+        I topped up
+      </button>,
+    ];
+  }
 
   if (props.prompt.amount > allowance) {
     // Require allowance to cover at least the first payment
     return (
-      <ApproveButton
+      <TransactionButton
         prompt={props.prompt}
         chain={chain as SupportedChain}
-        onSuccessfulApprove={() => {
+        onExecuted={() => {
           setHasJustApproved(true);
           updateAllowance();
         }}
+        buttonType="approve"
       />
     );
   }
+
+  const startButton = (
+    <TransactionButton
+      prompt={props.prompt}
+      chain={chain as SupportedChain}
+      onExecuted={() => {
+        setHasStartedSubscription(true);
+
+        // Redirect to merchant after 3 seconds
+        window.setTimeout(function () {
+          window.location = props.prompt
+            .onSuccessUrl as any;
+        }, 3000);
+      }}
+      buttonType="start"
+    />
+  );
 
   if (hasJustApproved) {
     return [
       <p style={{ marginBottom: 8 }} key={0}>
         Awesome! You have successfully approved!
       </p>,
-      <StartButton key={1} />,
+      startButton,
     ];
   }
 
-  return <StartButton />;
+  if (hasStartedSubscription) {
+    <p style={{ marginBottom: 8 }}>
+      Awesome! You have started the subscription!
+      Redirecting you back to the merchant.
+    </p>;
+  }
+
+  return startButton;
 }
 
 // Validate provided chain ids and resolve them to number ids
@@ -277,6 +376,7 @@ async function resolvePrompt(
     "period",
     "chains",
     "domain",
+    "onSuccessUrl",
   ];
 
   const missingParams = requiredParams.filter(
@@ -302,12 +402,30 @@ async function resolvePrompt(
     period,
     serializedChains,
     domain,
+    onSuccessUrl,
   ] = paramsValues;
 
-  if (!ValidPeriods.includes(period)) {
-    throw new Error(
-      `Provided period ${period} is not valid.`
-    );
+  let periodSeconds: number;
+  switch (period) {
+    case "min":
+      periodSeconds = 60;
+      break;
+    case "day":
+      periodSeconds = 60 * 60 * 24;
+      break;
+    case "week":
+      periodSeconds = 60 * 60 * 24 * 7;
+      break;
+    case "month":
+      periodSeconds = 60 * 60 * 24 * 30;
+      break;
+    case "year":
+      periodSeconds = 60 * 60 * 24 * 365;
+      break;
+    default:
+      throw new Error(
+        `Provided period ${period} is not valid.`
+      );
   }
 
   const resolvedTargetAddress =
@@ -341,9 +459,11 @@ async function resolvePrompt(
     merchantDomain: domain,
     amount,
     tokenSymbol,
-    period,
+    periodHuman: period,
+    periodSeconds: periodSeconds,
     availableChains,
     product,
+    onSuccessUrl,
   };
 }
 
@@ -429,16 +549,10 @@ export function Subscribe() {
       <p style={{ marginBottom: 8 }}>
         {prompt.product}
       </p>
-      <p>
+      <p style={{ marginBottom: 8 }}>
         {prompt.amount} {prompt.tokenSymbol} per{" "}
-        {prompt.period}
+        {prompt.periodHuman}
       </p>
-      {prompt.merchantAddress && (
-        <p style={{ marginBottom: 8 }}>
-          Money will be transferred to{" "}
-          {prompt.merchantAddress}
-        </p>
-      )}
       {!networkHook.chain && (
         <button
           onClick={() => open()}

@@ -74,10 +74,59 @@ export async function queryCurrentAllowance(
     publicClient: client,
   });
 
-  const allowance = await contract.read.allowance(
-    [userAddress, RouterAddress]
-  );
-  return (
-    Number(allowance) / 10 ** tokenProps.decimals
-  );
+  try {
+    const allowance =
+      await contract.read.allowance([
+        userAddress,
+        RouterAddress,
+      ]);
+    return (
+      Number(allowance) /
+      10 ** tokenProps.decimals
+    );
+  } catch (e) {
+    console.log(
+      `Failed to query allowance for ${tokenSymbol} on ${chain.name} chain`,
+      e
+    );
+    return 0;
+  }
+}
+
+// Returns current balance for the given token. In human readable format.
+export async function queryCurrentBalance(
+  chain: SupportedChain,
+  tokenSymbol: string,
+  userAddress: Hex
+): Promise<number> {
+  const client = createPublicClient({
+    chain: chain,
+    transport: http(),
+  });
+
+  const tokenProps =
+    ChainsSettings[chain.id].tokens[
+      tokenSymbol as keyof (typeof ChainsSettings)[typeof chain.id]["tokens"]
+    ];
+
+  const contract = getContract({
+    address: tokenProps.address as Hex,
+    abi: erc20ABI,
+    publicClient: client,
+  });
+
+  try {
+    const balance = await contract.read.balanceOf(
+      [userAddress]
+    );
+    return (
+      Number(balance) / 10 ** tokenProps.decimals
+    );
+  } catch (e) {
+    console.log(
+      `Failed to query balance for ${tokenSymbol} on ${chain.name} chain`,
+      e
+    );
+    return 0;
+  }
 }

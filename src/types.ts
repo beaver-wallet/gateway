@@ -31,7 +31,7 @@ export const SupportedChainIds =
   SupportedChains.map((chain) => chain.id);
 
 export const RouterAddress =
-  "0x34207C538E39F2600FE672bB84A90efF190ae4C7";
+  "0x249b13D5d31cdF4a6EB536F1B94B497dF9238f2d";
 
 export interface SubscriptionPrompt {
   merchantDomain: string;
@@ -39,8 +39,10 @@ export interface SubscriptionPrompt {
   product: string;
   tokenSymbol: string;
   amount: number;
-  period: Period;
+  periodHuman: Period;
+  periodSeconds: number;
   availableChains: SupportedChain[];
+  onSuccessUrl: string;
 }
 
 export interface RequiredSearchParams {
