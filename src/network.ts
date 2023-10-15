@@ -6,11 +6,23 @@ import {
   http,
 } from "viem";
 import {
-  ChainsSettings,
-  RouterAddress,
+  MerchantInfo,
+  Subscription,
   SupportedChain,
 } from "./types";
-import { erc20ABI } from "wagmi";
+import {
+  erc20ABI,
+  mainnet,
+  sepolia,
+} from "wagmi";
+import {
+  ChainByName,
+  ChainsSettings,
+  IndexerUrl,
+  RouterAddress,
+} from "./constants";
+import { periodToHuman } from "./utils";
+import { polygon } from "viem/chains";
 
 const BeaverDnsKey = "beaver-address=";
 
@@ -130,3 +142,125 @@ export async function queryCurrentBalance(
     return 0;
   }
 }
+
+export async function getSubscriptionsByUser(
+  userAddress: Hex
+): Promise<Subscription[]> {
+  const response = await fetch(
+    `${IndexerUrl}/subscriptions/user/${userAddress}`
+  );
+  const rawSubscriptions: [] =
+    await response.json();
+
+  return rawSubscriptions.map((rawSub: any) => ({
+    subscriptionHash: rawSub["subscription_hash"],
+    chain: ChainByName[rawSub["chain"]],
+    userAddress: rawSub["user_address"],
+    merchantAddress: rawSub["merchant_address"],
+    merchantDomain: rawSub["merchant_domain"],
+    product: rawSub["product"],
+    nonce: rawSub["nonce"],
+    tokenAddress: rawSub["token_address"],
+    tokenSymbol: rawSub["token_symbol"],
+    uintAmount: rawSub["uint_amount"],
+    humanAmount: rawSub["human_amount"],
+    periodSeconds: rawSub["period"],
+    periodHuman: periodToHuman(rawSub["period"]),
+    startTs: rawSub["start_ts"],
+    paymentPeriod: rawSub["payment_period"],
+    paymentsMade: rawSub["payments_made"],
+    terminated: rawSub["terminated"],
+  }));
+}
+
+export async function getSubscriptionByHash(
+  subscriptionHash: Hex
+): Promise<Subscription | null> {
+  const response = await fetch(
+    `${IndexerUrl}/subscription/${subscriptionHash}`
+  );
+  if (response.status === 404) return null;
+  const rawSub: any = await response.json();
+
+  return {
+    subscriptionHash: rawSub["subscription_hash"],
+    chain: ChainByName[rawSub["chain"]],
+    userAddress: rawSub["user_address"],
+    merchantAddress: rawSub["merchant_address"],
+    merchantDomain: rawSub["merchant_domain"],
+    product: rawSub["product"],
+    nonce: rawSub["nonce"],
+    tokenAddress: rawSub["token_address"],
+    tokenSymbol: rawSub["token_symbol"],
+    uintAmount: rawSub["uint_amount"],
+    humanAmount: rawSub["human_amount"],
+    periodSeconds: rawSub["period"],
+    periodHuman: periodToHuman(rawSub["period"]),
+    startTs: rawSub["start_ts"],
+    paymentPeriod: rawSub["payment_period"],
+    paymentsMade: rawSub["payments_made"],
+    terminated: rawSub["terminated"],
+  };
+}
+
+export async function getAllSubscriptions(): Promise<
+  Subscription[]
+> {
+  const response = await fetch(
+    `${IndexerUrl}/subscriptions/all`
+  );
+  const rawSubscriptions: [] =
+    await response.json();
+
+  return rawSubscriptions.map((rawSub: any) => ({
+    subscriptionHash: rawSub["subscription_hash"],
+    chain: ChainByName[rawSub["chain"]],
+    userAddress: rawSub["user_address"],
+    merchantAddress: rawSub["merchant_address"],
+    merchantDomain: rawSub["merchant_domain"],
+    product: rawSub["product"],
+    nonce: rawSub["nonce"],
+    tokenAddress: rawSub["token_address"],
+    tokenSymbol: rawSub["token_symbol"],
+    uintAmount: rawSub["uint_amount"],
+    humanAmount: rawSub["human_amount"],
+    periodSeconds: rawSub["period"],
+    periodHuman: periodToHuman(rawSub["period"]),
+    startTs: rawSub["start_ts"],
+    paymentPeriod: rawSub["payment_period"],
+    paymentsMade: rawSub["payments_made"],
+    terminated: rawSub["terminated"],
+  }));
+}
+
+export async function getMerchantInfo(): Promise<MerchantInfo> {
+  return {
+    address:
+      "0x1234567890123456789012345678901234567890",
+    activeSubscriptionsNumber: 12,
+    mrrUsd: 130,
+    balances: [
+      {
+        amount: 215.54,
+        tokenSymbol: "USDT",
+        chain: polygon,
+      },
+      {
+        amount: 327.15,
+        tokenSymbol: "USDT",
+        chain: sepolia,
+      },
+      {
+        amount: 184.81,
+        tokenSymbol: "DAI",
+        chain: mainnet,
+      },
+    ],
+    totalEarnedUsd: 1274.03,
+    worksOnChains: [mainnet, sepolia],
+  };
+}
+
+export async function updateMerchantInfo(
+  newWorksOnChains: SupportedChain[]
+) {}

@@ -10,7 +10,10 @@ import {
   createWeb3Modal,
   defaultWagmiConfig,
 } from "@web3modal/wagmi/react";
-import { SupportedChains } from "./types";
+import { ManageList } from "./ManageList";
+import { SupportedChains } from "./constants";
+import { ManageSingle } from "./ManageSingle";
+import { All } from "./All";
 
 // Wallet connect project id
 export const projectId =
@@ -49,6 +52,23 @@ function App() {
             path="/subscribe"
             element={<Subscribe />}
           />
+          <Route
+            path="/manage"
+            element={<ManageList />}
+          />
+          <Route
+            path="/manage/:address"
+            element={<ManageList />}
+          />
+          <Route
+            path="/subscription"
+            element={<ManageSingle />}
+          />
+          <Route
+            path="/subscription/:subscriptionHash"
+            element={<ManageSingle />}
+          />
+          <Route path="/all" element={<All />} />
         </Routes>
       </BrowserRouter>
     </WagmiConfig>

@@ -6,12 +6,8 @@ import {
   resolveDomainToAddress,
 } from "./network";
 import {
-  ChainsSettings,
-  RouterAddress,
   SubscriptionPrompt,
   SupportedChain,
-  SupportedChainIds,
-  SupportedChains,
 } from "./types";
 import {
   erc20ABI,
@@ -24,47 +20,22 @@ import {
 } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { TestSubscribeSearchParams } from "./TestData";
-import { encodeFunctionData } from "viem";
+import {
+  encodeFunctionData,
+  padHex,
+  toHex,
+} from "viem";
 import { RouterABI } from "./abi";
+import { CoreFrame } from "./CoreFrame";
+import {
+  BeaverInitiator,
+  ChainsSettings,
+  RouterAddress,
+  SupportedChainIds,
+  SupportedChains,
+} from "./constants";
 
-function CoreFrame(props: {
-  title: string;
-  children?: any;
-}) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: "white",
-          width: "400px",
-          height: "60vh",
-          marginTop: "10vh",
-          boxShadow: `0 0 2px 2px black`,
-          borderRadius: "20px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: 16,
-        }}
-      >
-        <p
-          style={{
-            fontSize: 24,
-            marginBottom: 16,
-          }}
-        >
-          {props.title}
-        </p>
-        {props.children}
-      </div>
-    </div>
-  );
-}
+const utf8EncodeText = new TextEncoder();
 
 function TransactionButton(props: {
   prompt: SubscriptionPrompt;
@@ -103,14 +74,35 @@ function TransactionButton(props: {
         functionName: "startSubscription",
         args: [
           props.prompt.merchantAddress,
-          props.prompt.merchantDomain,
-          "0x" + "1".repeat(64), // random
+          padHex(
+            toHex(
+              utf8EncodeText.encode(
+                props.prompt.subscriptionId
+              )
+            ),
+            { size: 32 }
+          ),
+          toHex(
+            utf8EncodeText.encode(
+              props.prompt.merchantDomain
+            ),
+            { size: 32 }
+          ),
+          padHex(
+            toHex(
+              utf8EncodeText.encode(
+                props.prompt.product
+              )
+            ),
+            { size: 32 }
+          ),
           tokenProps.address,
           props.prompt.amount *
             10 ** tokenProps.decimals,
-          props.prompt.periodSeconds, // Billing cycle length
-          0, // Free trial length
-          60 * 60 * 24 * 365, // Period to make a single payment. TODO: change. For development purposes only!
+          props.prompt.periodSeconds,
+          props.prompt.freeTrialLength,
+          props.prompt.paymentPeriod,
+          BeaverInitiator,
         ],
       }),
     };
@@ -140,11 +132,20 @@ function TransactionButton(props: {
     }
     if (waitHook.isSuccess) {
       props.onExecuted();
+      if (props.buttonType === "approve") {
+        return <div />;
+      } else {
+        return (
+          <p>
+            Success! Redirecting you back to the
+            merchant!
+          </p>
+        );
+      }
+    }
+    if (waitHook.error) {
       return (
-        <p>
-          Success! Redirecting you back to the
-          merchant!
-        </p>
+        <p>Error: {waitHook.error.message}</p>
       );
     }
   }
@@ -377,6 +378,9 @@ async function resolvePrompt(
     "chains",
     "domain",
     "onSuccessUrl",
+    "subscriptionId",
+    "freeTrialLength",
+    "paymentPeriod",
   ];
 
   const missingParams = requiredParams.filter(
@@ -403,6 +407,9 @@ async function resolvePrompt(
     serializedChains,
     domain,
     onSuccessUrl,
+    subscriptionId,
+    rawFreeTrialLength,
+    rawPaymentPeriod,
   ] = paramsValues;
 
   let periodSeconds: number;
@@ -454,6 +461,32 @@ async function resolvePrompt(
     );
   }
 
+  let freeTrialLength: number;
+  try {
+    freeTrialLength = parseFloat(
+      rawFreeTrialLength
+    );
+  } catch (e) {
+    throw new Error(
+      `Provided freeTrialLength ${rawFreeTrialLength} is not a valid number.`
+    );
+  }
+
+  let paymentPeriod: number;
+  try {
+    paymentPeriod = parseFloat(rawPaymentPeriod);
+  } catch (e) {
+    throw new Error(
+      `Provided paymentPeriod ${rawPaymentPeriod} is not a valid number.`
+    );
+  }
+
+  if (subscriptionId.length > 32) {
+    throw new Error(
+      `Subscription id length must not exceed 32 symbols.`
+    );
+  }
+
   return {
     merchantAddress: resolvedTargetAddress,
     merchantDomain: domain,
@@ -464,6 +497,9 @@ async function resolvePrompt(
     availableChains,
     product,
     onSuccessUrl,
+    subscriptionId,
+    freeTrialLength,
+    paymentPeriod,
   };
 }
 
