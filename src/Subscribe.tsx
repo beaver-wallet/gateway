@@ -515,9 +515,7 @@ export function Subscribe() {
     (async () => {
       try {
         const resolvedPrompt =
-          await resolvePrompt(
-            TestSubscribeSearchParams as any
-          );
+          await resolvePrompt(searchParams);
         setPrompt(resolvedPrompt);
       } catch (e) {
         console.error(e);
