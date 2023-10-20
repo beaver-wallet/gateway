@@ -19,12 +19,7 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { TestSubscribeSearchParams } from "./TestData";
-import {
-  encodeFunctionData,
-  padHex,
-  toHex,
-} from "viem";
+import { encodeFunctionData } from "viem";
 import { RouterABI } from "./abi";
 import { CoreFrame } from "./CoreFrame";
 import {
@@ -34,8 +29,7 @@ import {
   SupportedChainIds,
   SupportedChains,
 } from "./constants";
-
-const utf8EncodeText = new TextEncoder();
+import { humanToPeriodSeconds } from "./utils";
 
 function TransactionButton(props: {
   prompt: SubscriptionPrompt;
@@ -66,6 +60,15 @@ function TransactionButton(props: {
       }),
     };
   } else {
+    const metadata = {
+      subscription_id:
+        props.prompt.subscriptionId,
+      user_id: props.prompt.userId,
+      merchant_domain:
+        props.prompt.merchantDomain,
+      product: props.prompt.product,
+    };
+
     txData = {
       to: RouterAddress,
       value: BigInt(0),
@@ -74,34 +77,13 @@ function TransactionButton(props: {
         functionName: "startSubscription",
         args: [
           props.prompt.merchantAddress,
-          padHex(
-            toHex(
-              utf8EncodeText.encode(
-                props.prompt.subscriptionId
-              )
-            ),
-            { size: 32 }
-          ),
-          toHex(
-            utf8EncodeText.encode(
-              props.prompt.merchantDomain
-            ),
-            { size: 32 }
-          ),
-          padHex(
-            toHex(
-              utf8EncodeText.encode(
-                props.prompt.product
-              )
-            ),
-            { size: 32 }
-          ),
+          JSON.stringify(metadata), // produces a minimized json
           tokenProps.address,
           props.prompt.amount *
             10 ** tokenProps.decimals,
           props.prompt.periodSeconds,
-          props.prompt.freeTrialLength,
-          props.prompt.paymentPeriod,
+          props.prompt.freeTrialLengthSeconds,
+          props.prompt.paymentPeriodSeconds,
           BeaverInitiator,
         ],
       }),
@@ -378,7 +360,6 @@ async function resolvePrompt(
     "chains",
     "domain",
     "onSuccessUrl",
-    "subscriptionId",
     "freeTrialLength",
     "paymentPeriod",
   ];
@@ -407,33 +388,14 @@ async function resolvePrompt(
     serializedChains,
     domain,
     onSuccessUrl,
-    subscriptionId,
-    rawFreeTrialLength,
-    rawPaymentPeriod,
+    freeTrialLength,
+    paymentPeriod,
   ] = paramsValues;
 
-  let periodSeconds: number;
-  switch (period) {
-    case "min":
-      periodSeconds = 60;
-      break;
-    case "day":
-      periodSeconds = 60 * 60 * 24;
-      break;
-    case "week":
-      periodSeconds = 60 * 60 * 24 * 7;
-      break;
-    case "month":
-      periodSeconds = 60 * 60 * 24 * 30;
-      break;
-    case "year":
-      periodSeconds = 60 * 60 * 24 * 365;
-      break;
-    default:
-      throw new Error(
-        `Provided period ${period} is not valid.`
-      );
-  }
+  const subscriptionId = searchParams.get(
+    "subscriptionId"
+  );
+  const userId = searchParams.get("userId");
 
   const resolvedTargetAddress =
     await resolveDomainToAddress(domain);
@@ -461,45 +423,26 @@ async function resolvePrompt(
     );
   }
 
-  let freeTrialLength: number;
-  try {
-    freeTrialLength = parseFloat(
-      rawFreeTrialLength
-    );
-  } catch (e) {
-    throw new Error(
-      `Provided freeTrialLength ${rawFreeTrialLength} is not a valid number.`
-    );
-  }
-
-  let paymentPeriod: number;
-  try {
-    paymentPeriod = parseFloat(rawPaymentPeriod);
-  } catch (e) {
-    throw new Error(
-      `Provided paymentPeriod ${rawPaymentPeriod} is not a valid number.`
-    );
-  }
-
-  if (subscriptionId.length > 32) {
-    throw new Error(
-      `Subscription id length must not exceed 32 symbols.`
-    );
-  }
-
   return {
     merchantAddress: resolvedTargetAddress,
     merchantDomain: domain,
     amount,
     tokenSymbol,
     periodHuman: period,
-    periodSeconds: periodSeconds,
+    periodSeconds: humanToPeriodSeconds(period),
     availableChains,
     product,
     onSuccessUrl,
     subscriptionId,
-    freeTrialLength,
-    paymentPeriod,
+    userId,
+    freeTrialLengthHuman: freeTrialLength,
+    freeTrialLengthSeconds: humanToPeriodSeconds(
+      freeTrialLength
+    ),
+    paymentPeriodHuman: paymentPeriod,
+    paymentPeriodSeconds: humanToPeriodSeconds(
+      paymentPeriod
+    ),
   };
 }
 

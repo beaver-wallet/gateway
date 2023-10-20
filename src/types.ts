@@ -24,9 +24,12 @@ export interface SubscriptionPrompt {
   periodSeconds: number;
   availableChains: SupportedChain[];
   onSuccessUrl: string;
-  subscriptionId: string;
-  freeTrialLength: number;
-  paymentPeriod: number;
+  subscriptionId: string | null;
+  userId: string | null;
+  freeTrialLengthHuman: Period;
+  freeTrialLengthSeconds: number;
+  paymentPeriodHuman: Period;
+  paymentPeriodSeconds: number;
 }
 
 export interface RequiredSearchParams {

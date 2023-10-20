@@ -2,7 +2,6 @@ import {
   polygon,
   mainnet,
   sepolia,
-  optimism,
 } from "wagmi/chains";
 import { SupportedChain } from "./types";
 
@@ -32,7 +31,7 @@ export const ChainByName: {
 };
 
 export const RouterAddress =
-  "0x9F92973f3573032b16C5CE7d24226f2e3F76Ed28";
+  "0xe9265fa920552fE26DffCe55C5606B27eceE9c89";
 
 export const BeaverInitiator =
   "0xB38Bb847D9dC852B70d9ed539C87cF459812DA16";

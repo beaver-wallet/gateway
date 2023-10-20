@@ -52,21 +52,9 @@ export const RouterABI = [
       },
       {
         indexed: false,
-        internalType: "bytes32",
-        name: "subscriptionId",
-        type: "bytes32",
-      },
-      {
-        indexed: false,
-        internalType: "bytes32",
-        name: "merchantDomain",
-        type: "bytes32",
-      },
-      {
-        indexed: false,
-        internalType: "bytes32",
-        name: "product",
-        type: "bytes32",
+        internalType: "string",
+        name: "metadata",
+        type: "string",
       },
       {
         indexed: false,
@@ -120,6 +108,25 @@ export const RouterABI = [
     ],
     name: "SubscriptionTerminated",
     type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "newFee",
+        type: "uint256",
+      },
+    ],
+    name: "changeFee",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
     inputs: [
@@ -220,19 +227,9 @@ export const RouterABI = [
         type: "address",
       },
       {
-        internalType: "bytes32",
-        name: "subscriptionId",
-        type: "bytes32",
-      },
-      {
-        internalType: "bytes32",
-        name: "merchantDomain",
-        type: "bytes32",
-      },
-      {
-        internalType: "bytes32",
-        name: "product",
-        type: "bytes32",
+        internalType: "string",
+        name: "metadata",
+        type: "string",
       },
       {
         internalType: "address",
@@ -297,19 +294,9 @@ export const RouterABI = [
         type: "address",
       },
       {
-        internalType: "bytes32",
-        name: "subscriptionId",
-        type: "bytes32",
-      },
-      {
-        internalType: "bytes32",
-        name: "merchantDomain",
-        type: "bytes32",
-      },
-      {
-        internalType: "bytes32",
-        name: "product",
-        type: "bytes32",
+        internalType: "string",
+        name: "metadata",
+        type: "string",
       },
       {
         internalType: "address",

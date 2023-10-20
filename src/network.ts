@@ -36,12 +36,6 @@ export async function resolveDomainToAddress(
   const txtRecords: string[] = json.Answer.map(
     (a: any) => a.data
   );
-  if (txtRecords.length === 3) {
-    // For testing purposes only
-    txtRecords.push(
-      "beaver-address=0xB38Bb847D9dC852B70d9ed539C87cF459812DA16"
-    );
-  }
   console.log(
     `Resolving domain target address. TXT records of ${domain} are:`,
     txtRecords
