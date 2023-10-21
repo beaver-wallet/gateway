@@ -20,21 +20,9 @@ function SingleSubscriptionElement(props: {
   const nextPaymentDate = new Date(
     nextPaymentTimestamp * 1000
   );
-  const [hovered, serHovered] = useState(false);
   return (
     <div
-      style={{
-        border: "2px solid black",
-        borderRadius: 8,
-        padding: 8,
-        width: "100%",
-        marginBottom: 16,
-        backgroundColor: hovered
-          ? "rgba(0, 0, 0, 0.1)"
-          : "transparent",
-      }}
-      onMouseEnter={() => serHovered(true)}
-      onMouseLeave={() => serHovered(false)}
+      className="subscriptionListElement"
       onClick={() => {
         navigate(
           "/subscription/" +

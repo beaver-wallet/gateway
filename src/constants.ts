@@ -22,6 +22,11 @@ export const ValidPeriods = [
 export const SupportedChainIds =
   SupportedChains.map((chain) => chain.id);
 
+export const SupportedChainNames =
+  SupportedChains.map((chain) =>
+    chain.name.toLowerCase()
+  );
+
 export const ChainByName: {
   [chainName: string]: SupportedChain;
 } = {
@@ -47,23 +52,24 @@ export const ChainsSettings = {
           "0xdAC17F958D2ee523a2206206994597C13D831ec7",
         decimals: 6,
       },
-      LUSD: {
+      EURS: {
         address:
-          "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
-        decimals: 18,
+          "0xdB25f211AB05b1c97D595516F45794528a807ad8",
+        decimals: 2,
       },
     },
   },
   [polygon.id]: {
     tokens: {
       USDT: {
-        address: "",
-        decimals: 0,
-      },
-      LUSD: {
         address:
-          "0x23001f892c0c82b79303edc9b9033cd190bb21c7",
-        decimals: 18,
+          "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+        decimals: 6,
+      },
+      EURS: {
+        address:
+          "0xE111178A87A3BFf0c8d18DECBa5798827539Ae99",
+        decimals: 2,
       },
     },
   },

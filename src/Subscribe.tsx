@@ -26,7 +26,7 @@ import {
   BeaverInitiator,
   ChainsSettings,
   RouterAddress,
-  SupportedChainIds,
+  SupportedChainNames,
   SupportedChains,
 } from "./constants";
 import { humanToPeriodSeconds } from "./utils";
@@ -277,26 +277,28 @@ function PayButton(props: {
   return startButton;
 }
 
-// Validate provided chain ids and resolve them to number ids
+// Validate provided chain names and resolve them to number ids
 function deserializeAvailableChains(
   serializedChains: string
 ): SupportedChain[] {
   let chainsToChoose: SupportedChain[];
   try {
-    const chainIdsToChoose = serializedChains
+    const chainNamesToChoose = serializedChains
       .split(",")
-      .map(Number);
+      .map((value) => value.toLowerCase());
 
-    if (chainIdsToChoose.length === 0) {
+    if (chainNamesToChoose.length === 0) {
       throw new Error(
         "No chains for payment were provided."
       );
     }
 
-    // Validate that all chain ids are in SupportedChains list
+    // Validate that all chain names are in SupportedChains list
     const allChainsAreSupported =
-      chainIdsToChoose.every((chainId) =>
-        SupportedChainIds.includes(chainId as any)
+      chainNamesToChoose.every((chainName) =>
+        SupportedChainNames.includes(
+          chainName as any
+        )
       );
     if (!allChainsAreSupported) {
       throw new Error(
@@ -304,10 +306,11 @@ function deserializeAvailableChains(
       );
     }
 
-    chainsToChoose = chainIdsToChoose.map(
-      (chainId) =>
+    chainsToChoose = chainNamesToChoose.map(
+      (chainName) =>
         SupportedChains.find(
-          (chain) => chain.id === chainId
+          (chain) =>
+            chain.name.toLowerCase() === chainName
         )
     ) as any;
   } catch (e) {

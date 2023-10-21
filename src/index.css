@@ -1,3 +1,37 @@
 p {
   margin: 0;
 }
+
+button {
+  padding: 8px;
+  border-radius: 8px;
+  background-color: #00000011;
+  border-width: 0;
+}
+
+button:hover {
+  background-color: #00000022;
+}
+
+select {
+  padding: 4px;
+  border-radius: 8px;
+  background-color: #00000011;
+  border-width: 0;
+}
+
+select:hover {
+  background-color: #00000022;
+}
+
+.subscriptionListElement {
+  padding: 16px;
+  background-color: #00000011;
+  margin-bottom: 16px;
+  width: 100%;
+  border-radius: 16px;
+}
+
+.subscriptionListElement:hover {
+  background-color: #00000022;
+}

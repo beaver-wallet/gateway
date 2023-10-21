@@ -21,7 +21,7 @@ export function CoreFrame(props: {
           width: "400px",
           height: "60vh",
           marginTop: "10vh",
-          boxShadow: `0 0 2px 2px black`,
+          boxShadow: `0px 0px 4px 0px grey`,
           borderRadius: "20px",
           display: "flex",
           flexDirection: "column",
@@ -32,6 +32,7 @@ export function CoreFrame(props: {
             props.paddingHorizontal ?? 16,
           paddingRight:
             props.paddingHorizontal ?? 16,
+          overflowY: "scroll",
         }}
       >
         <div
