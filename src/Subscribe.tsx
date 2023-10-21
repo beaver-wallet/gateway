@@ -249,11 +249,13 @@ function PayButton(props: {
       onExecuted={() => {
         setHasStartedSubscription(true);
 
-        // Redirect to merchant after 3 seconds
-        window.setTimeout(function () {
-          window.location = props.prompt
-            .onSuccessUrl as any;
-        }, 3000);
+        if (props.prompt.onSuccessUrl) {
+          // Redirect to merchant after 3 seconds
+          window.setTimeout(function () {
+            window.location = props.prompt
+              .onSuccessUrl as any;
+          }, 3000);
+        }
       }}
       buttonType="start"
     />
@@ -268,10 +270,15 @@ function PayButton(props: {
     ];
   }
 
+  let startedText =
+    "Awesome! You have started the subscription!";
+  if (props.prompt.onSuccessUrl) {
+    startedText +=
+      "Redirecting you back to the merchant.";
+  }
   if (hasStartedSubscription) {
     <p style={{ marginBottom: 8 }}>
-      Awesome! You have started the subscription!
-      Redirecting you back to the merchant.
+      {startedText}
     </p>;
   }
 
@@ -359,7 +366,6 @@ async function resolvePrompt(
     "period",
     "chains",
     "domain",
-    "onSuccessUrl",
     "freeTrialLength",
     "paymentPeriod",
   ];
@@ -387,7 +393,6 @@ async function resolvePrompt(
     period,
     serializedChains,
     domain,
-    onSuccessUrl,
     freeTrialLength,
     paymentPeriod,
   ] = paramsValues;
@@ -396,6 +401,9 @@ async function resolvePrompt(
     "subscriptionId"
   );
   const userId = searchParams.get("userId");
+  const onSuccessUrl = searchParams.get(
+    "onSuccessUrl"
+  );
 
   const resolvedTargetAddress =
     await resolveDomainToAddress(domain);

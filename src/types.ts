@@ -23,7 +23,7 @@ export interface SubscriptionPrompt {
   periodHuman: Period;
   periodSeconds: number;
   availableChains: SupportedChain[];
-  onSuccessUrl: string;
+  onSuccessUrl: string | null;
   subscriptionId: string | null;
   userId: string | null;
   freeTrialLengthHuman: Period;
