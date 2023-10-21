@@ -367,7 +367,6 @@ async function resolvePrompt(
     "period",
     "chains",
     "domain",
-    "freeTrialLength",
   ];
 
   const missingParams = requiredParams.filter(
@@ -393,7 +392,6 @@ async function resolvePrompt(
     period,
     serializedChains,
     domain,
-    freeTrialLength,
   ] = paramsValues;
 
   const subscriptionId = searchParams.get(
@@ -403,6 +401,8 @@ async function resolvePrompt(
   const onSuccessUrl = searchParams.get(
     "onSuccessUrl"
   );
+  const freeTrialLength =
+    searchParams.get("freeTrialLength") || "0";
 
   const resolvedTargetAddress =
     await resolveDomainToAddress(domain);
