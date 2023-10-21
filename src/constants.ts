@@ -4,6 +4,7 @@ import {
   sepolia,
 } from "wagmi/chains";
 import { SupportedChain } from "./types";
+import { humanToPeriodSeconds } from "./utils";
 
 export const SupportedChains = [
   mainnet,
@@ -44,8 +45,11 @@ export const RouterAddress =
 export const BeaverInitiator =
   "0xB38Bb847D9dC852B70d9ed539C87cF459812DA16";
 
-export let IndexerUrl =
+export const IndexerUrl =
   "https://api.paybeaver.xyz";
+
+export const PaymentPeriod =
+  humanToPeriodSeconds("week");
 
 export const ChainsSettings = {
   [mainnet.id]: {

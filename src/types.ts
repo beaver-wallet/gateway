@@ -28,8 +28,6 @@ export interface SubscriptionPrompt {
   userId: string | null;
   freeTrialLengthHuman: Period;
   freeTrialLengthSeconds: number;
-  paymentPeriodHuman: Period;
-  paymentPeriodSeconds: number;
 }
 
 export interface RequiredSearchParams {

@@ -26,6 +26,7 @@ import {
   BeaverInitiator,
   ChainByName,
   ChainsSettings,
+  PaymentPeriod,
   RouterAddress,
   SupportedChainNames,
   SupportedChains,
@@ -84,7 +85,7 @@ function TransactionButton(props: {
             10 ** tokenProps.decimals,
           props.prompt.periodSeconds,
           props.prompt.freeTrialLengthSeconds,
-          props.prompt.paymentPeriodSeconds,
+          PaymentPeriod,
           BeaverInitiator,
         ],
       }),
@@ -367,7 +368,6 @@ async function resolvePrompt(
     "chains",
     "domain",
     "freeTrialLength",
-    "paymentPeriod",
   ];
 
   const missingParams = requiredParams.filter(
@@ -394,7 +394,6 @@ async function resolvePrompt(
     serializedChains,
     domain,
     freeTrialLength,
-    paymentPeriod,
   ] = paramsValues;
 
   const subscriptionId = searchParams.get(
@@ -446,10 +445,6 @@ async function resolvePrompt(
     freeTrialLengthHuman: freeTrialLength,
     freeTrialLengthSeconds: humanToPeriodSeconds(
       freeTrialLength
-    ),
-    paymentPeriodHuman: paymentPeriod,
-    paymentPeriodSeconds: humanToPeriodSeconds(
-      paymentPeriod
     ),
   };
 }
