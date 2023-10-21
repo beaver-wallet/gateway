@@ -24,6 +24,7 @@ import { RouterABI } from "./abi";
 import { CoreFrame } from "./CoreFrame";
 import {
   BeaverInitiator,
+  ChainByName,
   ChainsSettings,
   RouterAddress,
   SupportedChainNames,
@@ -307,11 +308,7 @@ function deserializeAvailableChains(
     }
 
     chainsToChoose = chainNamesToChoose.map(
-      (chainName) =>
-        SupportedChains.find(
-          (chain) =>
-            chain.name.toLowerCase() === chainName
-        )
+      (chainName) => ChainByName[chainName]
     ) as any;
   } catch (e) {
     throw new Error(

@@ -22,16 +22,19 @@ export const ValidPeriods = [
 export const SupportedChainIds =
   SupportedChains.map((chain) => chain.id);
 
-export const SupportedChainNames =
-  SupportedChains.map((chain) =>
-    chain.name.toLowerCase()
-  );
+export const SupportedChainNames = [
+  "sepolia",
+  "mainnet",
+  "ethereum",
+  "polygon",
+];
 
 export const ChainByName: {
   [chainName: string]: SupportedChain;
 } = {
   sepolia: sepolia,
   mainnet: mainnet,
+  ethereum: mainnet,
   polygon: polygon,
 };
 
