@@ -24,7 +24,7 @@ import {
 import { periodToHuman } from "./utils";
 import { polygon } from "viem/chains";
 
-const BeaverDnsKey = "beaver-address=";
+const BeaverDnsKey = "beaver-ethereum-address=";
 
 export async function resolveDomainToAddress(
   domain: string
