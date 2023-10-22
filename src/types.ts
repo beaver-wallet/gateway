@@ -30,15 +30,6 @@ export interface SubscriptionPrompt {
   freeTrialLengthSeconds: number;
 }
 
-export interface RequiredSearchParams {
-  product: string;
-  token: string;
-  amount: string;
-  period: string;
-  chains: string;
-  domain: string;
-}
-
 export interface Subscription {
   subscriptionHash: string;
   chain: SupportedChain;
@@ -57,19 +48,4 @@ export interface Subscription {
   paymentPeriod: number;
   paymentsMade: number;
   terminated: boolean;
-}
-
-export interface MerchantBalance {
-  amount: number;
-  tokenSymbol: string;
-  chain: SupportedChain;
-}
-
-export interface MerchantInfo {
-  address: Hex;
-  balances: MerchantBalance[];
-  mrrUsd: number;
-  activeSubscriptionsNumber: number;
-  totalEarnedUsd: number;
-  worksOnChains: SupportedChain[];
 }

@@ -6,15 +6,10 @@ import {
   http,
 } from "viem";
 import {
-  MerchantInfo,
   Subscription,
   SupportedChain,
 } from "./types";
-import {
-  erc20ABI,
-  mainnet,
-  sepolia,
-} from "wagmi";
+import { erc20ABI } from "wagmi";
 import {
   ChainByName,
   ChainsSettings,
@@ -22,7 +17,6 @@ import {
   RouterAddress,
 } from "./constants";
 import { periodToHuman } from "./utils";
-import { polygon } from "viem/chains";
 
 const BeaverDnsKey = "beaver-ethereum-address=";
 
