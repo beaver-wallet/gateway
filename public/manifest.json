@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Beaver Crypto Subscriptions",
+  "name": "Beaver Crypto Subscriptions gateway where you can subscribe to new services, view and maange your subscriptions.",
   "icons": [
     {
       "src": "favicon.ico",
