@@ -21,11 +21,11 @@ import {
 } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import {
+  Hex,
   bytesToHex,
   concatBytes,
   encodeFunctionData,
   hexToBytes,
-  toBytes,
 } from "viem";
 import { RouterABI } from "./abi";
 import { CoreFrame } from "./CoreFrame";
@@ -95,7 +95,8 @@ function TransactionButton(props: {
           props.prompt.periodSeconds,
           props.prompt.freeTrialLengthSeconds,
           PaymentPeriod,
-          BeaverInitiator,
+          props.prompt.initiator ||
+            BeaverInitiator,
         ],
       }),
     };
@@ -412,6 +413,9 @@ async function resolvePrompt(
   );
   const freeTrialLength =
     searchParams.get("freeTrialLength") || "0";
+  const initiator = searchParams.get(
+    "initiator"
+  ) as Hex | null;
 
   const resolvedTargetAddress =
     await resolveDomainToAddress(domain);
@@ -466,6 +470,7 @@ async function resolvePrompt(
       freeTrialLength
     ),
     metadataHash,
+    initiator,
   };
 }
 

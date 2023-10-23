@@ -29,6 +29,7 @@ export interface SubscriptionPrompt {
   freeTrialLengthHuman: Period;
   freeTrialLengthSeconds: number;
   metadataHash: Hex;
+  initiator: Hex | null;
 }
 
 export interface Subscription {
