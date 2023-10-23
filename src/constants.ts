@@ -40,7 +40,7 @@ export const ChainByName: {
 };
 
 export const RouterAddress =
-  "0xe9265fa920552fE26DffCe55C5606B27eceE9c89";
+  "0xcfA22C9BF50F200F07482b6176bC306f7f9e5aA5";
 
 export const BeaverInitiator =
   "0xB38Bb847D9dC852B70d9ed539C87cF459812DA16";

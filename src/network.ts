@@ -6,6 +6,7 @@ import {
   http,
 } from "viem";
 import {
+  Metadata,
   Subscription,
   SupportedChain,
 } from "./types";
@@ -219,4 +220,19 @@ export async function getAllSubscriptions(): Promise<
     paymentsMade: rawSub["payments_made"],
     terminated: rawSub["terminated"],
   }));
+}
+
+export async function hashMetadata(
+  metadata: Metadata
+): Promise<Hex> {
+  const response = await fetch(
+    `${IndexerUrl}/hash_metadata`,
+    {
+      body: JSON.stringify(metadata),
+      method: "POST",
+    }
+  );
+
+  const result = await response.text();
+  return result.replaceAll('"', "") as Hex; // remove quotes
 }

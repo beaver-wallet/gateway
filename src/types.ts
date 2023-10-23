@@ -28,6 +28,7 @@ export interface SubscriptionPrompt {
   userId: string | null;
   freeTrialLengthHuman: Period;
   freeTrialLengthSeconds: number;
+  metadataHash: Hex;
 }
 
 export interface Subscription {
@@ -48,4 +49,11 @@ export interface Subscription {
   paymentPeriod: number;
   paymentsMade: number;
   terminated: boolean;
+}
+
+export interface Metadata {
+  merchantDomain: string;
+  product: string;
+  subscriptionId: string | null;
+  userId: string | null;
 }

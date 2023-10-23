@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
+  hashMetadata as hashMetadataRemotely,
   queryCurrentAllowance,
   queryCurrentBalance,
   resolveDomainToAddress,
@@ -19,7 +20,13 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { encodeFunctionData } from "viem";
+import {
+  bytesToHex,
+  concatBytes,
+  encodeFunctionData,
+  hexToBytes,
+  toBytes,
+} from "viem";
 import { RouterABI } from "./abi";
 import { CoreFrame } from "./CoreFrame";
 import {
@@ -62,14 +69,16 @@ function TransactionButton(props: {
       }),
     };
   } else {
-    const metadata = {
-      subscription_id:
-        props.prompt.subscriptionId,
-      user_id: props.prompt.userId,
-      merchant_domain:
-        props.prompt.merchantDomain,
-      product: props.prompt.product,
-    };
+    const partialHash = hexToBytes(
+      props.prompt.metadataHash
+    ).slice(1);
+    const metadataEncodingVersion =
+      new Uint8Array([0]); // currently only one encoding version exists;
+    const metadataBytes = concatBytes([
+      metadataEncodingVersion,
+      partialHash,
+    ]);
+    const metadataHex = bytesToHex(metadataBytes);
 
     txData = {
       to: RouterAddress,
@@ -79,7 +88,7 @@ function TransactionButton(props: {
         functionName: "startSubscription",
         args: [
           props.prompt.merchantAddress,
-          JSON.stringify(metadata), // produces a minimized json
+          metadataHex,
           tokenProps.address,
           props.prompt.amount *
             10 ** tokenProps.decimals,
@@ -430,6 +439,16 @@ async function resolvePrompt(
     );
   }
 
+  const metadataHash = await hashMetadataRemotely(
+    {
+      merchantDomain: domain,
+      product,
+      subscriptionId,
+      userId,
+    }
+  );
+  console.log("metadata hash is", metadataHash);
+
   return {
     merchantAddress: resolvedTargetAddress,
     merchantDomain: domain,
@@ -446,6 +465,7 @@ async function resolvePrompt(
     freeTrialLengthSeconds: humanToPeriodSeconds(
       freeTrialLength
     ),
+    metadataHash,
   };
 }
 

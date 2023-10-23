@@ -6,6 +6,11 @@ export const RouterABI = [
         name: "owner",
         type: "address",
       },
+      {
+        internalType: "uint256",
+        name: "fee",
+        type: "uint256",
+      },
     ],
     stateMutability: "nonpayable",
     type: "constructor",
@@ -52,9 +57,9 @@ export const RouterABI = [
       },
       {
         indexed: false,
-        internalType: "string",
+        internalType: "bytes32",
         name: "metadata",
-        type: "string",
+        type: "bytes32",
       },
       {
         indexed: false,
@@ -227,9 +232,9 @@ export const RouterABI = [
         type: "address",
       },
       {
-        internalType: "string",
+        internalType: "bytes32",
         name: "metadata",
-        type: "string",
+        type: "bytes32",
       },
       {
         internalType: "address",
@@ -294,9 +299,9 @@ export const RouterABI = [
         type: "address",
       },
       {
-        internalType: "string",
+        internalType: "bytes32",
         name: "metadata",
-        type: "string",
+        type: "bytes32",
       },
       {
         internalType: "address",
