@@ -4,6 +4,7 @@ import {
   hashMetadata as hashMetadataRemotely,
   queryCurrentAllowance,
   queryCurrentBalance,
+  queryProductExistsOnChain,
   resolveDomainToAddress,
 } from "./network";
 import {
@@ -25,7 +26,10 @@ import {
   bytesToHex,
   concatBytes,
   encodeFunctionData,
+  encodePacked,
   hexToBytes,
+  keccak256,
+  zeroAddress,
 } from "viem";
 import { RouterABI } from "./abi";
 import { CoreFrame } from "./CoreFrame";
@@ -36,9 +40,61 @@ import {
   PaymentPeriod,
   RouterAddress,
   SupportedChainNames,
-  SupportedChains,
 } from "./constants";
 import { humanToPeriodSeconds } from "./utils";
+import { sepolia } from "wagmi/chains";
+
+function prepareMetadataHashToChain(
+  metadataHash: Hex
+): Hex {
+  const partialHash =
+    hexToBytes(metadataHash).slice(1);
+  const metadataEncodingVersion = new Uint8Array([
+    0,
+  ]); // currently only one encoding version exists;
+  const metadataBytes = concatBytes([
+    metadataEncodingVersion,
+    partialHash,
+  ]);
+
+  return bytesToHex(metadataBytes);
+}
+
+function hashProduct(
+  chain: SupportedChain,
+  merchant: Hex,
+  productMetadata: Hex,
+  tokenAddress: Hex,
+  uintAmount: number,
+  period: number,
+  freeTrialLength: number,
+  paymentPeriod: number
+) {
+  return keccak256(
+    encodePacked(
+      [
+        "uint256",
+        "address",
+        "bytes32",
+        "address",
+        "uint256",
+        "uint256",
+        "uint256",
+        "uint256",
+      ],
+      [
+        BigInt(chain.id),
+        merchant,
+        productMetadata,
+        tokenAddress,
+        BigInt(uintAmount),
+        BigInt(period),
+        BigInt(freeTrialLength),
+        BigInt(paymentPeriod),
+      ]
+    )
+  );
+}
 
 function TransactionButton(props: {
   prompt: SubscriptionPrompt;
@@ -46,11 +102,45 @@ function TransactionButton(props: {
   onExecuted: () => void;
   buttonType: "approve" | "start";
 }) {
+  const [productExists, setProductExists] =
+    useState<boolean>();
+
   const tokenProps =
     ChainsSettings[props.chain.id].tokens[
       props.prompt
         .tokenSymbol as keyof (typeof ChainsSettings)[typeof props.chain.id]["tokens"]
     ];
+
+  const uintAmount =
+    props.prompt.amount *
+    10 ** tokenProps.decimals;
+  const productHash = hashProduct(
+    props.chain,
+    props.prompt.merchantAddress,
+    props.prompt.encodedProductMetadata,
+    tokenProps.address as Hex,
+    uintAmount,
+    props.prompt.periodSeconds,
+    props.prompt.freeTrialLengthSeconds,
+    PaymentPeriod
+  );
+  console.log("Product hash:", productHash);
+
+  useEffect(() => {
+    console.log("USE EFFECT!!!");
+    (async () => {
+      const productExists =
+        await queryProductExistsOnChain(
+          props.chain,
+          productHash
+        );
+      console.log(
+        "Product exists",
+        productExists
+      );
+      setProductExists(productExists);
+    })();
+  }, []);
 
   let txData;
   if (props.buttonType === "approve") {
@@ -69,37 +159,48 @@ function TransactionButton(props: {
       }),
     };
   } else {
-    const partialHash = hexToBytes(
-      props.prompt.metadataHash
-    ).slice(1);
-    const metadataEncodingVersion =
-      new Uint8Array([0]); // currently only one encoding version exists;
-    const metadataBytes = concatBytes([
-      metadataEncodingVersion,
-      partialHash,
-    ]);
-    const metadataHex = bytesToHex(metadataBytes);
-
-    txData = {
-      to: RouterAddress,
-      value: BigInt(0),
-      data: encodeFunctionData({
-        abi: RouterABI as any,
-        functionName: "startSubscription",
-        args: [
-          props.prompt.merchantAddress,
-          metadataHex,
-          tokenProps.address,
-          props.prompt.amount *
-            10 ** tokenProps.decimals,
-          props.prompt.periodSeconds,
-          props.prompt.freeTrialLengthSeconds,
-          PaymentPeriod,
-          props.prompt.initiator ||
-            BeaverInitiator,
-        ],
-      }),
-    };
+    if (productExists === undefined) {
+      txData = {
+        to: zeroAddress,
+        value: BigInt(0),
+      };
+    } else if (productExists) {
+      txData = {
+        to: RouterAddress,
+        value: BigInt(0),
+        data: encodeFunctionData({
+          abi: RouterABI as any,
+          functionName: "startSubscription",
+          args: [
+            productHash,
+            props.prompt
+              .encodedSubscriptionMetadata,
+          ],
+        }),
+      };
+    } else {
+      // product doesn't exist yet
+      txData = {
+        to: RouterAddress,
+        value: BigInt(0),
+        data: encodeFunctionData({
+          abi: RouterABI as any,
+          functionName:
+            "setupEnvironmentAndStartSubscription",
+          args: [
+            props.prompt.merchantAddress,
+            props.prompt.encodedProductMetadata,
+            tokenProps.address,
+            uintAmount,
+            props.prompt.periodSeconds,
+            props.prompt.freeTrialLengthSeconds,
+            PaymentPeriod,
+            props.prompt
+              .encodedSubscriptionMetadata,
+          ],
+        }),
+      };
+    }
   }
 
   const { config } =
@@ -145,6 +246,10 @@ function TransactionButton(props: {
   }
   if (sendHook.error) {
     return <p>Error: {sendHook.error.message}</p>;
+  }
+
+  if (productExists === undefined) {
+    return <p>Loading...</p>;
   }
 
   const buttonText =
@@ -211,11 +316,7 @@ function PayButton(props: {
   useEffect(() => {
     updateAllowance();
     updateBalance();
-  }, [
-    userAccount,
-    chain,
-    props.prompt.tokenSymbol,
-  ]);
+  }, [userAccount.address, chain]);
 
   if (
     allowance === undefined ||
@@ -443,17 +544,29 @@ async function resolvePrompt(
     );
   }
 
-  const metadataHash = await hashMetadataRemotely(
-    {
+  const productMetadataHash =
+    await hashMetadataRemotely({
       merchantDomain: domain,
-      product,
+      productName: product,
+    });
+
+  const encodedProductMetadata =
+    prepareMetadataHashToChain(
+      productMetadataHash
+    );
+
+  const subscriptionMetadataHash =
+    await hashMetadataRemotely({
       subscriptionId,
       userId,
-    }
-  );
-  console.log("metadata hash is", metadataHash);
+    });
 
-  return {
+  const encodedSubscriptionMetadata =
+    prepareMetadataHashToChain(
+      subscriptionMetadataHash
+    );
+
+  const prompt: SubscriptionPrompt = {
     merchantAddress: resolvedTargetAddress,
     merchantDomain: domain,
     amount,
@@ -469,9 +582,13 @@ async function resolvePrompt(
     freeTrialLengthSeconds: humanToPeriodSeconds(
       freeTrialLength
     ),
-    metadataHash,
+    encodedProductMetadata,
+    encodedSubscriptionMetadata,
     initiator,
   };
+  console.log("Got subscription prompt", prompt);
+
+  return prompt;
 }
 
 export function Subscribe() {
@@ -496,6 +613,22 @@ export function Subscribe() {
       }
     })();
   }, [searchParams]);
+
+  useEffect(() => {
+    if (
+      !prompt ||
+      !networkHook.chain ||
+      !switchNetwork
+    )
+      return;
+    if (
+      !prompt.availableChains
+        .map((chain) => chain.id)
+        .includes(networkHook.chain.id as any)
+    ) {
+      switchNetwork(prompt.availableChains[0].id);
+    }
+  }, [prompt, networkHook.chain, switchNetwork]);
 
   if (!prompt) return <div />;
 

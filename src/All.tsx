@@ -6,34 +6,16 @@ function SubscriptionLine(props: {
   subscription: Subscription;
 }) {
   const sub = props.subscription;
-  const nextPaymentTimestamp =
-    sub.startTs +
-    sub.periodSeconds * (sub.paymentsMade + 1);
-
   const nextPaymentDate = new Date(
-    nextPaymentTimestamp * 1000
+    sub.nextPaymentAt * 1000
   );
-  const currentTs = Date.now() / 1000;
 
-  const needsToBePaidBefore =
-    sub.startTs +
-    sub.periodSeconds * sub.paymentsMade +
-    sub.paymentPeriod;
-  const shouldHaveBeenPaid =
-    currentTs > nextPaymentTimestamp;
-
-  const expired = currentTs > needsToBePaidBefore;
-
-  let status = "Active";
   let statusColor = "green";
-  if (expired) {
-    status = "Expired";
+  if (sub.status === "expired") {
     statusColor = "red";
   } else if (sub.terminated) {
-    status = "Terminated";
     statusColor = "blue";
-  } else if (shouldHaveBeenPaid) {
-    status = "Missing payment!";
+  } else if (sub.status === "pending") {
     statusColor = "yellow";
   }
 
@@ -64,7 +46,7 @@ function SubscriptionLine(props: {
         <span
           style={{ backgroundColor: statusColor }}
         >
-          {status}
+          {sub.status}
         </span>
       </p>
       <p
@@ -83,7 +65,7 @@ function SubscriptionLine(props: {
           marginRight: 16,
         }}
       >
-        Merchant: {sub.merchantAddress}
+        Merchant: {sub.product.merchantAddress}
       </p>
     </div>
   );
@@ -95,14 +77,24 @@ export function All() {
 
   useEffect(() => {
     const getSubscriptions = async () => {
+      console.log("Querying subscriptions");
       const subscriptions =
         await getAllSubscriptions();
+      console.log(
+        "Got subscriptions",
+        subscriptions
+      );
       setSubscriptions(subscriptions);
     };
     getSubscriptions();
   }, []);
   return (
     <div>
+      {subscriptions === undefined ? (
+        <p>Loading...</p>
+      ) : subscriptions.length === 0 ? (
+        <p>No subscriptions</p>
+      ) : null}
       {subscriptions?.map(
         (subscription, index) => (
           <SubscriptionLine

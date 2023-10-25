@@ -40,13 +40,20 @@ export const ChainByName: {
 };
 
 export const RouterAddress =
-  "0xcfA22C9BF50F200F07482b6176bC306f7f9e5aA5";
+  "0x00d7eA8c8d5e9f488658787Aad2A0C33d33122fC";
 
 export const BeaverInitiator =
   "0xB38Bb847D9dC852B70d9ed539C87cF459812DA16";
 
-export const IndexerUrl =
-  "https://api.paybeaver.xyz";
+export let IndexerUrl: string;
+if (
+  !process.env.NODE_ENV ||
+  process.env.NODE_ENV === "development"
+) {
+  IndexerUrl = "http://127.0.0.1:8000";
+} else {
+  IndexerUrl = "https://api.paybeaver.xyz";
+}
 
 export const PaymentPeriod =
   humanToPeriodSeconds("week");

@@ -1,12 +1,13 @@
 import {
   Hex,
   createPublicClient,
+  encodeFunctionData,
   getAddress,
   getContract,
+  hexToNumber,
   http,
 } from "viem";
 import {
-  Metadata,
   Subscription,
   SupportedChain,
 } from "./types";
@@ -18,8 +19,50 @@ import {
   RouterAddress,
 } from "./constants";
 import { periodToHuman } from "./utils";
+import { RouterABI } from "./abi";
 
 const BeaverDnsKey = "beaver-ethereum-address=";
+
+function deserializeSubscription(
+  rawSub: any
+): Subscription {
+  const rawProduct = rawSub["product"];
+  return {
+    subscriptionHash: rawSub["subscription_hash"],
+    product: {
+      productHash: rawProduct["product_hash"],
+      chain: ChainByName[rawProduct["chain"]],
+      merchantAddress:
+        rawProduct["merchant_address"],
+      tokenAddress: rawProduct["token_address"],
+      tokenSymbol: rawProduct["token_symbol"],
+      tokenDecimals: rawProduct["token_decimals"],
+      uintAmount: rawProduct["uint_amount"],
+      humanAmount: rawProduct["human_amount"],
+      period: rawProduct["period"],
+      periodHuman: periodToHuman(
+        rawProduct["period"]
+      ),
+      freeTrialLength:
+        rawProduct["free_trial_length"],
+      paymentPeriod: rawProduct["payment_period"],
+      metadataHash: rawProduct["metadata_hash"],
+      merchantDomain:
+        rawProduct["merchant_domain"],
+      productName: rawProduct["product_name"],
+    },
+    userAddress: rawSub["user_address"],
+    startTs: rawSub["start_ts"],
+    paymentsMade: rawSub["payments_made"],
+    terminated: rawSub["terminated"],
+    metadataHash: rawSub["metadata_hash"],
+    subscriptionId: rawSub["subscription_id"],
+    userId: rawSub["user_id"],
+    status: rawSub["status"],
+    isActive: rawSub["is_active"],
+    nextPaymentAt: rawSub["next_payment_at"],
+  };
+}
 
 export async function resolveDomainToAddress(
   domain: string
@@ -141,25 +184,9 @@ export async function getSubscriptionsByUser(
   const rawSubscriptions: [] =
     await response.json();
 
-  return rawSubscriptions.map((rawSub: any) => ({
-    subscriptionHash: rawSub["subscription_hash"],
-    chain: ChainByName[rawSub["chain"]],
-    userAddress: rawSub["user_address"],
-    merchantAddress: rawSub["merchant_address"],
-    merchantDomain: rawSub["merchant_domain"],
-    product: rawSub["product"],
-    nonce: rawSub["nonce"],
-    tokenAddress: rawSub["token_address"],
-    tokenSymbol: rawSub["token_symbol"],
-    uintAmount: rawSub["uint_amount"],
-    humanAmount: rawSub["human_amount"],
-    periodSeconds: rawSub["period"],
-    periodHuman: periodToHuman(rawSub["period"]),
-    startTs: rawSub["start_ts"],
-    paymentPeriod: rawSub["payment_period"],
-    paymentsMade: rawSub["payments_made"],
-    terminated: rawSub["terminated"],
-  }));
+  return rawSubscriptions.map((rawSub: any) =>
+    deserializeSubscription(rawSub)
+  );
 }
 
 export async function getSubscriptionByHash(
@@ -171,25 +198,7 @@ export async function getSubscriptionByHash(
   if (response.status === 404) return null;
   const rawSub: any = await response.json();
 
-  return {
-    subscriptionHash: rawSub["subscription_hash"],
-    chain: ChainByName[rawSub["chain"]],
-    userAddress: rawSub["user_address"],
-    merchantAddress: rawSub["merchant_address"],
-    merchantDomain: rawSub["merchant_domain"],
-    product: rawSub["product"],
-    nonce: rawSub["nonce"],
-    tokenAddress: rawSub["token_address"],
-    tokenSymbol: rawSub["token_symbol"],
-    uintAmount: rawSub["uint_amount"],
-    humanAmount: rawSub["human_amount"],
-    periodSeconds: rawSub["period"],
-    periodHuman: periodToHuman(rawSub["period"]),
-    startTs: rawSub["start_ts"],
-    paymentPeriod: rawSub["payment_period"],
-    paymentsMade: rawSub["payments_made"],
-    terminated: rawSub["terminated"],
-  };
+  return deserializeSubscription(rawSub);
 }
 
 export async function getAllSubscriptions(): Promise<
@@ -201,29 +210,13 @@ export async function getAllSubscriptions(): Promise<
   const rawSubscriptions: [] =
     await response.json();
 
-  return rawSubscriptions.map((rawSub: any) => ({
-    subscriptionHash: rawSub["subscription_hash"],
-    chain: ChainByName[rawSub["chain"]],
-    userAddress: rawSub["user_address"],
-    merchantAddress: rawSub["merchant_address"],
-    merchantDomain: rawSub["merchant_domain"],
-    product: rawSub["product"],
-    nonce: rawSub["nonce"],
-    tokenAddress: rawSub["token_address"],
-    tokenSymbol: rawSub["token_symbol"],
-    uintAmount: rawSub["uint_amount"],
-    humanAmount: rawSub["human_amount"],
-    periodSeconds: rawSub["period"],
-    periodHuman: periodToHuman(rawSub["period"]),
-    startTs: rawSub["start_ts"],
-    paymentPeriod: rawSub["payment_period"],
-    paymentsMade: rawSub["payments_made"],
-    terminated: rawSub["terminated"],
-  }));
+  return rawSubscriptions.map((rawSub: any) =>
+    deserializeSubscription(rawSub)
+  );
 }
 
 export async function hashMetadata(
-  metadata: Metadata
+  metadata: any
 ): Promise<Hex> {
   const response = await fetch(
     `${IndexerUrl}/hash_metadata`,
@@ -235,4 +228,33 @@ export async function hashMetadata(
 
   const result = await response.text();
   return result.replaceAll('"', "") as Hex; // remove quotes
+}
+
+export async function queryProductExistsOnChain(
+  chain: SupportedChain,
+  productHash: Hex
+): Promise<boolean> {
+  const rpcClient = createPublicClient({
+    chain: chain,
+    transport: http(),
+  });
+  // productHash =
+  //   "0x61943A83395B7C4147DA040EC9597954DB75CDB471BECDA24FF6BA4A6075AAD2";
+  const result = await rpcClient.call({
+    to: RouterAddress,
+    data: encodeFunctionData({
+      abi: RouterABI,
+      functionName: "products",
+      args: [productHash],
+    }),
+  });
+  if (!result.data) {
+    return false;
+  }
+
+  const allBytesAreZero =
+    hexToNumber(result.data) === 0;
+
+  // if there is at least one non-zero byte, then the product does exist
+  return !allBytesAreZero;
 }

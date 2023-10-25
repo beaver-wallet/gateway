@@ -73,25 +73,30 @@ function TerminateButton(props: {
     ];
   }
 
-  if (chain.id !== props.subscription.chain.id) {
+  if (
+    chain.id !==
+    props.subscription.product.chain.id
+  ) {
     if (!switchNetwork) {
       return (
         <p style={{ marginBottom: 8 }} key={0}>
           To terminate subscription, switch to{" "}
-          {props.subscription.chain.name} chain
+          {props.subscription.product.chain.name}{" "}
+          chain
         </p>
       );
     }
     return [
       <p key={0} style={{ marginBottom: 8 }}>
         To terminate subscription, switch to{" "}
-        {props.subscription.chain.name} chain
+        {props.subscription.product.chain.name}{" "}
+        chain
       </p>,
       <button
         key={1}
         onClick={() =>
           switchNetwork(
-            props.subscription.chain.id
+            props.subscription.product.chain.id
           )
         }
       >
@@ -163,7 +168,7 @@ export function ManageSingle() {
 
   const nextPaymentTimestamp =
     subscription.startTs +
-    subscription.periodSeconds *
+    subscription.product.period *
       (subscription.paymentsMade + 1);
 
   const nextPaymentDate = new Date(
@@ -191,18 +196,19 @@ export function ManageSingle() {
       backPath={`/manage/${subscription.userAddress}`}
     >
       <p style={{ marginBottom: 8 }}>
-        {subscription.product}
+        {subscription.product.productName}
       </p>
       <p style={{ marginBottom: 8 }}>
-        {subscription.merchantDomain}
+        {subscription.product.merchantDomain}
       </p>
       <p style={{ marginBottom: 8 }}>
-        {subscription.humanAmount}{" "}
-        {subscription.tokenSymbol} /{" "}
-        {subscription.periodHuman}
+        {subscription.product.humanAmount}{" "}
+        {subscription.product.tokenSymbol} /{" "}
+        {subscription.product.periodHuman}
       </p>
       <p style={{ marginBottom: 8 }}>
-        Blockchain: {subscription.chain.name}
+        Blockchain:{" "}
+        {subscription.product.chain.name}
       </p>
       {subscription.terminated
         ? terminatedBlock

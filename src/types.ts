@@ -28,33 +28,40 @@ export interface SubscriptionPrompt {
   userId: string | null;
   freeTrialLengthHuman: Period;
   freeTrialLengthSeconds: number;
-  metadataHash: Hex;
+  encodedProductMetadata: Hex;
+  encodedSubscriptionMetadata: Hex;
   initiator: Hex | null;
+}
+
+export interface Product {
+  productHash: string;
+  chain: SupportedChain;
+  merchantAddress: Hex;
+  tokenAddress: Hex;
+  tokenSymbol: string;
+  tokenDecimals: number;
+  uintAmount: number;
+  humanAmount: number;
+  period: number;
+  periodHuman: string;
+  freeTrialLength: number;
+  paymentPeriod: number;
+  metadataHash: string;
+  merchantDomain: string;
+  productName: string;
 }
 
 export interface Subscription {
   subscriptionHash: string;
-  chain: SupportedChain;
+  product: Product;
   userAddress: Hex;
-  merchantAddress: Hex;
-  merchantDomain: Hex;
-  product: string;
-  nonce: Hex;
-  tokenAddress: Hex;
-  tokenSymbol: string;
-  uintAmount: number;
-  humanAmount: number;
-  periodHuman: Period;
-  periodSeconds: number;
   startTs: number;
-  paymentPeriod: number;
   paymentsMade: number;
   terminated: boolean;
-}
-
-export interface Metadata {
-  merchantDomain: string;
-  product: string;
+  metadataHash: string;
   subscriptionId: string | null;
   userId: string | null;
+  status: string;
+  isActive: boolean;
+  nextPaymentAt: number;
 }

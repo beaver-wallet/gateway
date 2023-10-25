@@ -14,7 +14,7 @@ function SingleSubscriptionElement(props: {
   const navigate = useNavigate();
   const nextPaymentTimestamp =
     props.subscription.startTs +
-    props.subscription.periodSeconds *
+    props.subscription.product.period *
       (props.subscription.paymentsMade + 1);
 
   const nextPaymentDate = new Date(
@@ -31,13 +31,16 @@ function SingleSubscriptionElement(props: {
       }}
     >
       <p>
-        {props.subscription.product} @{" "}
-        {props.subscription.merchantDomain}
+        {props.subscription.product.productName} @{" "}
+        {
+          props.subscription.product
+            .merchantDomain
+        }
       </p>
       <p>
-        {props.subscription.humanAmount}{" "}
-        {props.subscription.tokenSymbol} /{" "}
-        {props.subscription.periodHuman}
+        {props.subscription.product.humanAmount}{" "}
+        {props.subscription.product.tokenSymbol} /{" "}
+        {props.subscription.product.periodHuman}
       </p>
       <p>
         Next payment at{" "}
