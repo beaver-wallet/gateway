@@ -1,14 +1,24 @@
 import { Hex } from "viem";
 import {
-  polygon,
-  mainnet,
-  sepolia,
-} from "wagmi/chains";
+  SupportedChainIds,
+  SupportedChains,
+} from "./constants";
 
 export type SupportedChain =
-  | typeof mainnet
-  | typeof polygon
-  | typeof sepolia;
+  (typeof SupportedChains)[0];
+
+export type SupportedChainIdsType =
+  (typeof SupportedChainIds)[0];
+
+export interface SingleChainSettings {
+  routerAddress: Hex;
+  tokens: any;
+}
+
+export type ChainsSettingsType = Record<
+  SupportedChainIdsType,
+  SingleChainSettings
+>;
 
 export interface SubscriptionPrompt {
   merchantDomain: string;

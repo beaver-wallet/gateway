@@ -1,3 +1,6 @@
+import { SupportedChains } from "./constants";
+import { SupportedChain } from "./types";
+
 export const MinuteInSeconds = 60;
 export const HourInSeconds = MinuteInSeconds * 60;
 export const DayInSeconds = HourInSeconds * 24;
@@ -62,4 +65,30 @@ export function timeDaysSeconds(
     humanDays.slice(0, humanDays.length - 1)
   );
   return days * 60 * 60 * 24;
+}
+
+export function normalizeChainName(
+  chainName: string
+): string {
+  return chainName
+    .toLowerCase()
+    .replaceAll(" ", "-");
+}
+
+export function getChainByName(
+  chainName: string
+): SupportedChain | null {
+  const normalizedSearchedChainName =
+    normalizeChainName(chainName);
+
+  for (const chain of SupportedChains) {
+    if (
+      normalizeChainName(chain.name) ===
+      normalizedSearchedChainName
+    ) {
+      return chain;
+    }
+  }
+
+  return null;
 }

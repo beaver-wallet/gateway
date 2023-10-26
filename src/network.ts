@@ -13,12 +13,13 @@ import {
 } from "./types";
 import { erc20ABI } from "wagmi";
 import {
-  ChainByName,
   ChainsSettings,
   IndexerUrl,
-  RouterAddress,
 } from "./constants";
-import { timeSecondsToHuman } from "./utils";
+import {
+  getChainByName,
+  timeSecondsToHuman,
+} from "./utils";
 import { RouterABI } from "./abi";
 
 const BeaverDnsKey = "beaver-ethereum-address=";
@@ -31,7 +32,7 @@ function deserializeSubscription(
     subscriptionHash: rawSub["subscription_hash"],
     product: {
       productHash: rawProduct["product_hash"],
-      chain: ChainByName[rawProduct["chain"]],
+      chain: getChainByName(rawProduct["chain"])!,
       merchantAddress:
         rawProduct["merchant_address"],
       tokenAddress: rawProduct["token_address"],
@@ -122,7 +123,7 @@ export async function queryCurrentAllowance(
     const allowance =
       await contract.read.allowance([
         userAddress,
-        RouterAddress,
+        ChainsSettings[chain.id].routerAddress,
       ]);
     return (
       Number(allowance) /
@@ -238,10 +239,9 @@ export async function queryProductExistsOnChain(
     chain: chain,
     transport: http(),
   });
-  // productHash =
-  //   "0x61943A83395B7C4147DA040EC9597954DB75CDB471BECDA24FF6BA4A6075AAD2";
+
   const result = await rpcClient.call({
-    to: RouterAddress,
+    to: ChainsSettings[chain.id].routerAddress,
     data: encodeFunctionData({
       abi: RouterABI,
       functionName: "products",

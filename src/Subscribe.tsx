@@ -34,18 +34,14 @@ import {
 import { RouterABI } from "./abi";
 import { CoreFrame } from "./CoreFrame";
 import {
-  BeaverInitiator,
-  ChainByName,
   ChainsSettings,
   PaymentPeriod,
-  RouterAddress,
-  SupportedChainNames,
 } from "./constants";
 import {
+  getChainByName,
   timeDaysSeconds,
   timeSecondsToHuman,
 } from "./utils";
-import { sepolia } from "wagmi/chains";
 
 function prepareMetadataHashToChain(
   metadataHash: Hex
@@ -114,6 +110,9 @@ function TransactionButton(props: {
         .tokenSymbol as keyof (typeof ChainsSettings)[typeof props.chain.id]["tokens"]
     ];
 
+  const routerAddress =
+    ChainsSettings[props.chain.id].routerAddress;
+
   const uintAmount =
     props.prompt.amount *
     10 ** tokenProps.decimals;
@@ -154,7 +153,7 @@ function TransactionButton(props: {
         abi: erc20ABI as any,
         functionName: "approve",
         args: [
-          RouterAddress,
+          routerAddress,
           props.prompt.amount *
             10 ** tokenProps.decimals *
             1000,
@@ -169,7 +168,7 @@ function TransactionButton(props: {
       };
     } else if (productExists) {
       txData = {
-        to: RouterAddress,
+        to: routerAddress,
         value: BigInt(0),
         data: encodeFunctionData({
           abi: RouterABI as any,
@@ -184,7 +183,7 @@ function TransactionButton(props: {
     } else {
       // product doesn't exist yet
       txData = {
-        to: RouterAddress,
+        to: routerAddress,
         value: BigInt(0),
         data: encodeFunctionData({
           abi: RouterABI as any,
@@ -418,10 +417,9 @@ function deserializeAvailableChains(
 
     // Validate that all chain names are in SupportedChains list
     const allChainsAreSupported =
-      chainNamesToChoose.every((chainName) =>
-        SupportedChainNames.includes(
-          chainName as any
-        )
+      chainNamesToChoose.every(
+        (chainName) =>
+          getChainByName(chainName) !== null
       );
     if (!allChainsAreSupported) {
       throw new Error(
@@ -430,7 +428,7 @@ function deserializeAvailableChains(
     }
 
     chainsToChoose = chainNamesToChoose.map(
-      (chainName) => ChainByName[chainName]
+      (chainName) => getChainByName(chainName)
     ) as any;
   } catch (e) {
     throw new Error(

@@ -12,8 +12,8 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { RouterAddress } from "./constants";
 import { RouterABI } from "./abi";
+import { ChainsSettings } from "./constants";
 
 function TerminateButton(props: {
   subscription: Subscription;
@@ -22,7 +22,9 @@ function TerminateButton(props: {
   const { switchNetwork } = useSwitchNetwork();
   const { open } = useWeb3Modal();
   const { config } = usePrepareSendTransaction({
-    to: RouterAddress,
+    to: ChainsSettings[
+      props.subscription.product.chain.id
+    ].routerAddress,
     value: BigInt(0),
     data: encodeFunctionData({
       abi: RouterABI as any,
