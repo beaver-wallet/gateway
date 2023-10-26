@@ -1,54 +1,65 @@
-export function periodToHuman(
-  seconds: number
+export const MinuteInSeconds = 60;
+export const HourInSeconds = MinuteInSeconds * 60;
+export const DayInSeconds = HourInSeconds * 24;
+export const WeekInSeconds = DayInSeconds * 7;
+export const MonthInSeconds = DayInSeconds * 30;
+export const YearInSeconds = DayInSeconds * 365;
+
+export const HumanAndSecondsPeriods: [
+  string,
+  number
+][] = [
+  ["year", YearInSeconds],
+  ["month", MonthInSeconds],
+  ["week", WeekInSeconds],
+  ["day", DayInSeconds],
+  ["hour", HourInSeconds],
+  ["minute", MinuteInSeconds],
+  ["second", 1],
+];
+
+// Take a number of seconds and converts it to a human-readable such as
+// "1 month"
+export function timeSecondsToHuman(
+  secondsAmount: number
 ): string {
-  switch (seconds) {
-    case 0:
-      return "0";
-    case 60:
-      return "minute";
-    case 3600:
-      return "hour";
-    case 86400:
-      return "day";
-    case 604800:
-      return "week";
-    case 2592000:
-      return "month";
-    case 31536000:
-      return "year";
-    default:
-      return `${seconds} seconds`;
+  let amount: number = secondsAmount;
+  let unit: string = "second";
+
+  for (const [
+    unitName,
+    baseAmount,
+  ] of HumanAndSecondsPeriods) {
+    if (secondsAmount % baseAmount === 0) {
+      amount = secondsAmount / baseAmount;
+      unit = unitName;
+      break;
+    }
   }
+
+  if (amount === 1) {
+    return unit; // return "week" instead of "1 week"
+  }
+
+  unit += "s";
+  return `${amount} ${unit}`;
 }
 
-export function humanToPeriodSeconds(
-  human: string
+// Takes a string with a number of days like "30d" and converts it
+// to a number of seconds such as 2592000.
+export function timeDaysSeconds(
+  humanDays: string
 ): number {
-  let periodSeconds: number;
-  switch (human) {
-    case "0":
-      periodSeconds = 0;
-      break;
-    case "min":
-      periodSeconds = 60;
-      break;
-    case "day":
-      periodSeconds = 60 * 60 * 24;
-      break;
-    case "week":
-      periodSeconds = 60 * 60 * 24 * 7;
-      break;
-    case "month":
-      periodSeconds = 60 * 60 * 24 * 30;
-      break;
-    case "year":
-      periodSeconds = 60 * 60 * 24 * 365;
-      break;
-    default:
-      throw new Error(
-        `Provided human period ${human} is not valid.`
-      );
-  }
+  if (humanDays === "0") return 0;
 
-  return periodSeconds;
+  const regexp = /^[1-9]\d*d$/; // must be in format like 100d (aka 100 days)
+  if (!regexp.test(humanDays)) {
+    throw new Error(
+      `Provided period ${humanDays} is not valid. Example valid period: 30d.`
+    );
+  }
+  const days = parseInt(
+    humanDays.slice(0, humanDays.length - 1)
+  );
+  return days * 60 * 60 * 24;
 }

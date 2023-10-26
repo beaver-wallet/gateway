@@ -4,20 +4,12 @@ import {
   sepolia,
 } from "wagmi/chains";
 import { SupportedChain } from "./types";
-import { humanToPeriodSeconds } from "./utils";
+import { timeDaysSeconds } from "./utils";
 
 export const SupportedChains = [
   mainnet,
   polygon,
   sepolia,
-];
-
-export const ValidPeriods = [
-  "min",
-  "day",
-  "week",
-  "month",
-  "year",
 ];
 
 export const SupportedChainIds =
@@ -56,7 +48,7 @@ if (
 }
 
 export const PaymentPeriod =
-  humanToPeriodSeconds("week");
+  timeDaysSeconds("7d");
 
 export const ChainsSettings = {
   [mainnet.id]: {

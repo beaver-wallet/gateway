@@ -4,15 +4,11 @@ import {
   mainnet,
   sepolia,
 } from "wagmi/chains";
-import { ValidPeriods } from "./constants";
 
 export type SupportedChain =
   | typeof mainnet
   | typeof polygon
   | typeof sepolia;
-
-export type Period =
-  (typeof ValidPeriods)[number];
 
 export interface SubscriptionPrompt {
   merchantDomain: string;
@@ -20,13 +16,13 @@ export interface SubscriptionPrompt {
   product: string;
   tokenSymbol: string;
   amount: number;
-  periodHuman: Period;
+  periodHuman: string;
   periodSeconds: number;
   availableChains: SupportedChain[];
   onSuccessUrl: string | null;
   subscriptionId: string | null;
   userId: string | null;
-  freeTrialLengthHuman: Period;
+  freeTrialLengthHuman: string;
   freeTrialLengthSeconds: number;
   encodedProductMetadata: Hex;
   encodedSubscriptionMetadata: Hex;

@@ -41,7 +41,10 @@ import {
   RouterAddress,
   SupportedChainNames,
 } from "./constants";
-import { humanToPeriodSeconds } from "./utils";
+import {
+  timeDaysSeconds,
+  timeSecondsToHuman,
+} from "./utils";
 import { sepolia } from "wagmi/chains";
 
 function prepareMetadataHashToChain(
@@ -566,22 +569,32 @@ async function resolvePrompt(
       subscriptionMetadataHash
     );
 
+  const periodSeconds = timeDaysSeconds(period);
+  const periodHuman = timeSecondsToHuman(
+    periodSeconds
+  );
+
+  const freeTrialLengthSeconds = timeDaysSeconds(
+    freeTrialLength
+  );
+  const freeTrialLengthHuman = timeSecondsToHuman(
+    freeTrialLengthSeconds
+  );
+
   const prompt: SubscriptionPrompt = {
     merchantAddress: resolvedTargetAddress,
     merchantDomain: domain,
     amount,
     tokenSymbol,
-    periodHuman: period,
-    periodSeconds: humanToPeriodSeconds(period),
+    periodHuman,
+    periodSeconds,
     availableChains,
     product,
     onSuccessUrl,
     subscriptionId,
     userId,
-    freeTrialLengthHuman: freeTrialLength,
-    freeTrialLengthSeconds: humanToPeriodSeconds(
-      freeTrialLength
-    ),
+    freeTrialLengthHuman,
+    freeTrialLengthSeconds,
     encodedProductMetadata,
     encodedSubscriptionMetadata,
     initiator,

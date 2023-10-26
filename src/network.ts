@@ -18,7 +18,7 @@ import {
   IndexerUrl,
   RouterAddress,
 } from "./constants";
-import { periodToHuman } from "./utils";
+import { timeSecondsToHuman } from "./utils";
 import { RouterABI } from "./abi";
 
 const BeaverDnsKey = "beaver-ethereum-address=";
@@ -40,7 +40,7 @@ function deserializeSubscription(
       uintAmount: rawProduct["uint_amount"],
       humanAmount: rawProduct["human_amount"],
       period: rawProduct["period"],
-      periodHuman: periodToHuman(
+      periodHuman: timeSecondsToHuman(
         rawProduct["period"]
       ),
       freeTrialLength:
