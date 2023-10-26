@@ -580,7 +580,7 @@ async function resolvePrompt(
     amount,
     tokenSymbol,
     periodHuman,
-    periodSeconds: 60, // TODO: change to normal
+    periodSeconds,
     availableChains,
     product,
     onSuccessUrl,
