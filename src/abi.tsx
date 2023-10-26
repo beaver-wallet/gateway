@@ -410,11 +410,11 @@ export const RouterABI = [
         type: "address",
       },
     ],
-    name: "paymentInitiators",
+    name: "merchantSettings",
     outputs: [
       {
         internalType: "address",
-        name: "",
+        name: "initiator",
         type: "address",
       },
     ],

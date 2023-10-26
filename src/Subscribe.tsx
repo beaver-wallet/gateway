@@ -129,20 +129,15 @@ function TransactionButton(props: {
   console.log("Product hash:", productHash);
 
   useEffect(() => {
-    console.log("USE EFFECT!!!");
     (async () => {
       const productExists =
         await queryProductExistsOnChain(
           props.chain,
           productHash
         );
-      console.log(
-        "Product exists",
-        productExists
-      );
       setProductExists(productExists);
     })();
-  }, []);
+  }, [props.chain]);
 
   let txData;
   if (props.buttonType === "approve") {
@@ -585,7 +580,7 @@ async function resolvePrompt(
     amount,
     tokenSymbol,
     periodHuman,
-    periodSeconds,
+    periodSeconds: 60, // TODO: change to normal
     availableChains,
     product,
     onSuccessUrl,

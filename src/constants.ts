@@ -1,6 +1,4 @@
 import {
-  polygon,
-  mainnet,
   sepolia,
   polygonMumbai,
 } from "wagmi/chains";
@@ -8,8 +6,6 @@ import { ChainsSettingsType } from "./types";
 import { timeDaysSeconds } from "./utils";
 
 export const SupportedChains = [
-  mainnet,
-  polygon,
   sepolia,
   polygonMumbai,
 ];
@@ -32,39 +28,9 @@ export const PaymentPeriod =
 
 export const ChainsSettings: ChainsSettingsType =
   {
-    [mainnet.id]: {
-      routerAddress: "0x",
-      tokens: {
-        USDT: {
-          address:
-            "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-          decimals: 6,
-        },
-        EURS: {
-          address:
-            "0xdB25f211AB05b1c97D595516F45794528a807ad8",
-          decimals: 2,
-        },
-      },
-    },
-    [polygon.id]: {
-      routerAddress: "0x",
-      tokens: {
-        USDT: {
-          address:
-            "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
-          decimals: 6,
-        },
-        EURS: {
-          address:
-            "0xE111178A87A3BFf0c8d18DECBa5798827539Ae99",
-          decimals: 2,
-        },
-      },
-    },
     [sepolia.id]: {
       routerAddress:
-        "0x00d7eA8c8d5e9f488658787Aad2A0C33d33122fC",
+        "0x2918592c2deaBC44f18C8291ae19999D908c23ff",
       tokens: {
         USDT: {
           address:
@@ -80,7 +46,7 @@ export const ChainsSettings: ChainsSettingsType =
     },
     [polygonMumbai.id]: {
       routerAddress:
-        "0x2651Ff0C4025c21d42E4dAaA14d5C41dc3DECD25",
+        "0x9f86fAb93F14B98EFe68786606CcF4113C7c1A0b",
       tokens: {
         USDT: {
           address:
