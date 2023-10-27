@@ -10,14 +10,13 @@ export type SupportedChain =
 export type SupportedChainIdsType =
   (typeof SupportedChainIds)[0];
 
-export interface SingleChainSettings {
-  routerAddress: Hex;
-  tokens: any;
-}
-
 export type ChainsSettingsType = Record<
   SupportedChainIdsType,
-  SingleChainSettings
+  {
+    routerAddress: Hex;
+    rpc: string;
+    tokens: any;
+  }
 >;
 
 export interface SubscriptionPrompt {
@@ -34,8 +33,8 @@ export interface SubscriptionPrompt {
   userId: string | null;
   freeTrialLengthHuman: string;
   freeTrialLengthSeconds: number;
-  encodedProductMetadata: Hex;
-  encodedSubscriptionMetadata: Hex;
+  productMetadataCID: Hex;
+  subscriptionMetadataCID: Hex;
   initiator: Hex | null;
 }
 
@@ -52,7 +51,7 @@ export interface Product {
   periodHuman: string;
   freeTrialLength: number;
   paymentPeriod: number;
-  metadataHash: string;
+  metadataCID: string;
   merchantDomain: string;
   productName: string;
 }
@@ -64,7 +63,7 @@ export interface Subscription {
   startTs: number;
   paymentsMade: number;
   terminated: boolean;
-  metadataHash: string;
+  metadataCID: string;
   subscriptionId: string | null;
   userId: string | null;
   status: string;

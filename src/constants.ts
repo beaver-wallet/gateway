@@ -32,6 +32,7 @@ export const EmptyProduct =
 export const ChainsSettings: ChainsSettingsType =
   {
     [sepolia.id]: {
+      rpc: "https://eth-sepolia-public.unifra.io",
       routerAddress:
         "0x97a64798E1CB5B34c5868aA1F19758831F13eBf4",
       tokens: {
@@ -48,6 +49,7 @@ export const ChainsSettings: ChainsSettingsType =
       },
     },
     [polygonMumbai.id]: {
+      rpc: "https://rpc.ankr.com/polygon_mumbai",
       routerAddress:
         "0x9CdB06a9689C07a8834B3B5E1209C3cF1E7fC5E4",
       tokens: {

@@ -108,7 +108,7 @@ function TransactionButton(props: {
   const productHash = hashProduct(
     props.chain,
     props.prompt.merchantAddress,
-    props.prompt.encodedProductMetadata,
+    props.prompt.productMetadataCID,
     tokenProps.address as Hex,
     uintAmount,
     props.prompt.periodSeconds,
@@ -146,26 +146,10 @@ function TransactionButton(props: {
     };
   } else {
     console.log("Product exists", productExists);
-    if (productExists === undefined) {
-      txData = {
-        to: zeroAddress,
-        value: BigInt(0),
-      };
-    } else if (productExists) {
-      txData = {
-        to: routerAddress,
-        value: BigInt(0),
-        data: encodeFunctionData({
-          abi: RouterABI as any,
-          functionName: "startSubscription",
-          args: [
-            productHash,
-            props.prompt
-              .encodedSubscriptionMetadata,
-          ],
-        }),
-      };
-    } else {
+    if (
+      productExists === undefined ||
+      productExists === false
+    ) {
       // product doesn't exist yet
       txData = {
         to: routerAddress,
@@ -176,14 +160,26 @@ function TransactionButton(props: {
             "setupEnvironmentAndStartSubscription",
           args: [
             props.prompt.merchantAddress,
-            props.prompt.encodedProductMetadata,
+            props.prompt.productMetadataCID,
             tokenProps.address,
             uintAmount,
             props.prompt.periodSeconds,
             props.prompt.freeTrialLengthSeconds,
             PaymentPeriod,
-            props.prompt
-              .encodedSubscriptionMetadata,
+            props.prompt.subscriptionMetadataCID,
+          ],
+        }),
+      };
+    } else {
+      txData = {
+        to: routerAddress,
+        value: BigInt(0),
+        data: encodeFunctionData({
+          abi: RouterABI as any,
+          functionName: "startSubscription",
+          args: [
+            productHash,
+            props.prompt.subscriptionMetadataCID,
           ],
         }),
       };
@@ -576,8 +572,9 @@ async function resolvePrompt(
     userId,
     freeTrialLengthHuman,
     freeTrialLengthSeconds,
-    encodedProductMetadata,
-    encodedSubscriptionMetadata,
+    productMetadataCID: encodedProductMetadata,
+    subscriptionMetadataCID:
+      encodedSubscriptionMetadata,
     initiator,
   };
   console.log("Got subscription prompt", prompt);

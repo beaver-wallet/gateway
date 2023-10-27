@@ -1,10 +1,12 @@
 import {
+  Chain,
   Hex,
+  PublicClient,
+  Transport,
   createPublicClient,
   encodeFunctionData,
   getAddress,
   getContract,
-  hexToNumber,
   http,
 } from "viem";
 import {
@@ -24,6 +26,17 @@ import {
 import { RouterABI } from "./abi";
 
 const BeaverDnsKey = "beaver-ethereum-address=";
+
+function getClientForChain(
+  chain: SupportedChain
+): PublicClient<Transport, Chain> {
+  // const rpc = ChainsSettings[chain.id].rpc;
+
+  return createPublicClient({
+    chain: chain,
+    transport: http(),
+  });
+}
 
 function deserializeSubscription(
   rawSub: any
@@ -48,7 +61,7 @@ function deserializeSubscription(
       freeTrialLength:
         rawProduct["free_trial_length"],
       paymentPeriod: rawProduct["payment_period"],
-      metadataHash: rawProduct["metadata_hash"],
+      metadataCID: rawProduct["metadata_cid"],
       merchantDomain:
         rawProduct["merchant_domain"],
       productName: rawProduct["product_name"],
@@ -57,7 +70,7 @@ function deserializeSubscription(
     startTs: rawSub["start_ts"],
     paymentsMade: rawSub["payments_made"],
     terminated: rawSub["terminated"],
-    metadataHash: rawSub["metadata_hash"],
+    metadataCID: rawSub["metadata_cid"],
     subscriptionId: rawSub["subscription_id"],
     userId: rawSub["user_id"],
     status: rawSub["status"],
@@ -104,10 +117,7 @@ export async function queryCurrentAllowance(
   tokenSymbol: string,
   userAddress: Hex
 ): Promise<number> {
-  const client = createPublicClient({
-    chain: chain,
-    transport: http(),
-  });
+  const client = getClientForChain(chain);
 
   const tokenProps =
     ChainsSettings[chain.id].tokens[
@@ -145,10 +155,7 @@ export async function queryCurrentBalance(
   tokenSymbol: string,
   userAddress: Hex
 ): Promise<number> {
-  const client = createPublicClient({
-    chain: chain,
-    transport: http(),
-  });
+  const client = getClientForChain(chain);
 
   const tokenProps =
     ChainsSettings[chain.id].tokens[
@@ -236,10 +243,7 @@ export async function queryProductExistsOnChain(
   chain: SupportedChain,
   productHash: Hex
 ): Promise<boolean> {
-  const rpcClient = createPublicClient({
-    chain: chain,
-    transport: http(),
-  });
+  const rpcClient = getClientForChain(chain);
 
   const result = await rpcClient.call({
     to: ChainsSettings[chain.id].routerAddress,

@@ -4,16 +4,24 @@ import {
   Routes,
 } from "react-router-dom";
 import { Subscribe } from "./Subscribe";
-import { WagmiConfig } from "wagmi";
-import { Home } from "./Home";
 import {
-  createWeb3Modal,
-  defaultWagmiConfig,
-} from "@web3modal/wagmi/react";
+  WagmiConfig,
+  configureChains,
+  createConfig,
+} from "wagmi";
+import { Home } from "./Home";
+import { createWeb3Modal } from "@web3modal/wagmi/react";
 import { ManageList } from "./ManageList";
-import { SupportedChains } from "./constants";
+import {
+  ChainsSettings,
+  SupportedChains,
+} from "./constants";
 import { ManageSingle } from "./ManageSingle";
 import { All } from "./All";
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
+import { SupportedChainIdsType } from "./types";
 
 // Wallet connect project id
 export const projectId =
@@ -23,16 +31,37 @@ export const metadata = {
   name: "Beaver Subscriptions Gateway",
   description:
     "Beaver Subscriptions Gateway - an easy way to pay for subscriptions with crypto",
-  url: "https://gateway.ethbeaver.xyz",
+  url: "https://gateway.paybeaver.xyz",
   icons: [
     "https://avatars.githubusercontent.com/u/37784886",
   ],
 };
 
-export const wagmiConfig = defaultWagmiConfig({
-  chains: SupportedChains,
-  projectId,
-  metadata,
+const { chains, publicClient } = configureChains(
+  SupportedChains,
+  [
+    jsonRpcProvider({
+      rpc: (chain) => ({
+        http: ChainsSettings[
+          chain.id as SupportedChainIdsType
+        ].rpc,
+      }),
+    }),
+  ]
+);
+
+export const wagmiConfig = createConfig({
+  publicClient,
+  connectors: [
+    new InjectedConnector({ chains }),
+    new WalletConnectConnector({
+      chains,
+      options: {
+        projectId,
+        metadata,
+      },
+    }),
+  ],
 });
 
 createWeb3Modal({
