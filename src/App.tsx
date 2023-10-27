@@ -59,6 +59,7 @@ export const wagmiConfig = createConfig({
       options: {
         projectId,
         metadata,
+        showQrModal: false,
       },
     }),
   ],
