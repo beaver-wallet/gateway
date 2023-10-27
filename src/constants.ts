@@ -61,3 +61,19 @@ export const ChainsSettings: ChainsSettingsType =
       },
     },
   };
+
+const AvailableTokensSet = SupportedChainIds.map(
+  (chainId) =>
+    new Set(
+      Object.keys(ChainsSettings[chainId].tokens)
+    )
+).reduce(
+  (accumulated, current) =>
+    new Set([...accumulated, ...current])
+);
+
+export const AvailableTokens = [
+  ...AvailableTokensSet,
+];
+
+console.log("Available tokens:", AvailableTokens);

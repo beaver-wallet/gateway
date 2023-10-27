@@ -22,6 +22,7 @@ import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { SupportedChainIdsType } from "./types";
+import { CreateShortcut } from "./CreateShortcut";
 
 // Wallet connect project id
 export const projectId =
@@ -99,6 +100,10 @@ function App() {
             element={<ManageSingle />}
           />
           <Route path="/all" element={<All />} />
+          <Route
+            path="/shortcut"
+            element={<CreateShortcut />}
+          />
         </Routes>
       </BrowserRouter>
     </WagmiConfig>

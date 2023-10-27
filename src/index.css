@@ -9,6 +9,11 @@ button {
   border-width: 0;
 }
 
+.mediumButton {
+  padding: 12px;
+  font-size: 14px;
+}
+
 button:hover {
   background-color: #00000022;
 }
@@ -24,6 +29,15 @@ select:hover {
   background-color: #00000022;
 }
 
+input {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #00000011;
+  border-width: 0px;
+}
+
 .subscriptionListElement {
   padding: 16px;
   background-color: #00000011;
@@ -34,4 +48,14 @@ select:hover {
 
 .subscriptionListElement:hover {
   background-color: #00000022;
+}
+
+.shortcutFormContainer {
+  width: 480px;
+  margin-bottom: 8px;
+}
+
+.shortcutFormContainer p {
+  padding-top: 8px;
+  padding-bottom: 4px;
 }

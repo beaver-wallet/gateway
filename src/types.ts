@@ -15,7 +15,13 @@ export type ChainsSettingsType = Record<
   {
     routerAddress: Hex;
     rpc: string;
-    tokens: any;
+    tokens: Record<
+      string,
+      {
+        address: Hex;
+        decimals: number;
+      }
+    >;
   }
 >;
 

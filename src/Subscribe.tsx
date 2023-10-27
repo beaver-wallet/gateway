@@ -455,12 +455,12 @@ async function resolvePrompt(
 ): Promise<SubscriptionPrompt> {
   // RequiredSearchParams
   const requiredParams = [
+    "domain",
     "product",
     "token",
     "amount",
     "period",
     "chains",
-    "domain",
   ];
 
   const missingParams = requiredParams.filter(
@@ -480,23 +480,23 @@ async function resolvePrompt(
   );
   const [
     // Assigning params to variables this way instead of using .get in order to not forget anything when adding or removing params
+    domain,
     product,
     tokenSymbol,
     rawAmount,
     period,
     serializedChains,
-    domain,
   ] = paramsValues;
 
+  const freeTrialLength =
+    searchParams.get("freeTrialLength") || "0";
+  const onSuccessUrl = searchParams.get(
+    "onSuccessUrl"
+  );
   const subscriptionId = searchParams.get(
     "subscriptionId"
   );
   const userId = searchParams.get("userId");
-  const onSuccessUrl = searchParams.get(
-    "onSuccessUrl"
-  );
-  const freeTrialLength =
-    searchParams.get("freeTrialLength") || "0";
   const initiator = searchParams.get(
     "initiator"
   ) as Hex | null;
