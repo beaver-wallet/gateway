@@ -93,7 +93,7 @@ export function All() {
       {subscriptions === undefined ? (
         <p>Loading...</p>
       ) : subscriptions.length === 0 ? (
-        <p>No subscriptions</p>
+        <p>No subscriptions.</p>
       ) : null}
       {subscriptions?.map(
         (subscription, index) => (

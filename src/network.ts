@@ -14,6 +14,7 @@ import {
 import { erc20ABI } from "wagmi";
 import {
   ChainsSettings,
+  EmptyProduct,
   IndexerUrl,
 } from "./constants";
 import {
@@ -216,11 +217,11 @@ export async function getAllSubscriptions(): Promise<
   );
 }
 
-export async function hashMetadata(
+export async function saveMetadataRemotely(
   metadata: any
-): Promise<Hex> {
+): Promise<string> {
   const response = await fetch(
-    `${IndexerUrl}/hash_metadata`,
+    `${IndexerUrl}/save_metadata`,
     {
       body: JSON.stringify(metadata),
       method: "POST",
@@ -228,7 +229,7 @@ export async function hashMetadata(
   );
 
   const result = await response.text();
-  return result.replaceAll('"', "") as Hex; // remove quotes
+  return result.replaceAll('"', ""); // remove quotes
 }
 
 export async function queryProductExistsOnChain(
@@ -252,9 +253,10 @@ export async function queryProductExistsOnChain(
     return false;
   }
 
-  const allBytesAreZero =
-    hexToNumber(result.data) === 0;
+  console.log(
+    "Checking product result:",
+    result.data
+  );
 
-  // if there is at least one non-zero byte, then the product does exist
-  return !allBytesAreZero;
+  return result.data !== EmptyProduct;
 }

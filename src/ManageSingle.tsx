@@ -5,6 +5,7 @@ import { Subscription } from "./types";
 import { getSubscriptionByHash } from "./network";
 import { Hex, encodeFunctionData } from "viem";
 import {
+  useAccount,
   useNetwork,
   usePrepareSendTransaction,
   useSendTransaction,
@@ -19,6 +20,7 @@ function TerminateButton(props: {
   subscription: Subscription;
 }) {
   const { chain } = useNetwork();
+  const userAccount = useAccount();
   const { switchNetwork } = useSwitchNetwork();
   const { open } = useWeb3Modal();
   const { config } = usePrepareSendTransaction({
@@ -107,6 +109,25 @@ function TerminateButton(props: {
     ];
   }
 
+  if (
+    userAccount.address! !==
+      props.subscription.userAddress &&
+    userAccount.address! !==
+      props.subscription.product.merchantAddress
+  ) {
+    return (
+      <p>
+        Only user (
+        {props.subscription.userAddress}) or
+        merchant (
+        {
+          props.subscription.product
+            .merchantAddress
+        }
+        ) can terminate this subscription.
+      </p>
+    );
+  }
   return [
     <p key={0} style={{ marginBottom: 8 }}>
       To terminate subscription, send a

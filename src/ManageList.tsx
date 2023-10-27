@@ -20,6 +20,29 @@ function SingleSubscriptionElement(props: {
   const nextPaymentDate = new Date(
     nextPaymentTimestamp * 1000
   );
+
+  let statusText;
+  if (
+    props.subscription.status === "paid" ||
+    props.subscription.status === "pending"
+  ) {
+    statusText = `Active. Next payment at ${nextPaymentDate.toLocaleString()}`;
+  } else if (
+    props.subscription.status === "expired"
+  ) {
+    statusText = "Expired.";
+    if (props.subscription.isActive) {
+      statusText += ` Valid until ${nextPaymentDate.toLocaleString()}`;
+    }
+  } else if (
+    props.subscription.status === "terminated"
+  ) {
+    statusText = "Terminated.";
+    if (props.subscription.isActive) {
+      statusText += ` Valid until ${nextPaymentDate.toLocaleString()}`;
+    }
+  }
+
   return (
     <div
       className="subscriptionListElement"
@@ -42,11 +65,7 @@ function SingleSubscriptionElement(props: {
         {props.subscription.product.tokenSymbol} /{" "}
         {props.subscription.product.periodHuman}
       </p>
-      <p>
-        Next payment at{" "}
-        {nextPaymentDate.toLocaleDateString()}{" "}
-        {nextPaymentDate.toLocaleTimeString()}
-      </p>
+      <p>{statusText}</p>
     </div>
   );
 }
@@ -92,20 +111,17 @@ export function ManageList() {
     );
   }
 
-  if (!subscriptions) {
-    return (
-      <CoreFrame title="My subscriptions">
-        <p>Loading...</p>
-      </CoreFrame>
-    );
-  }
-
   return (
     <CoreFrame
       title="My subscriptions"
       paddingHorizontal={32}
     >
-      {subscriptions.map(
+      {subscriptions === undefined ? (
+        <p>Loading...</p>
+      ) : subscriptions.length === 0 ? (
+        <p>No subscriptions.</p>
+      ) : null}
+      {subscriptions?.map(
         (subscription, index) => (
           <SingleSubscriptionElement
             subscription={subscription}

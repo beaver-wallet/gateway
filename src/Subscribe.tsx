@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
-  hashMetadata as hashMetadataRemotely,
+  saveMetadataRemotely,
   queryCurrentAllowance,
   queryCurrentBalance,
   queryProductExistsOnChain,
@@ -42,21 +42,10 @@ import {
   timeDaysSeconds,
   timeSecondsToHuman,
 } from "./utils";
+import { base58_to_binary } from "base58-js"; // type: ignore
 
-function prepareMetadataHashToChain(
-  metadataHash: Hex
-): Hex {
-  const partialHash =
-    hexToBytes(metadataHash).slice(1);
-  const metadataEncodingVersion = new Uint8Array([
-    0,
-  ]); // currently only one encoding version exists;
-  const metadataBytes = concatBytes([
-    metadataEncodingVersion,
-    partialHash,
-  ]);
-
-  return bytesToHex(metadataBytes);
+function minimizeIpfsCID(ipfsCID: string): Hex {
+  return bytesToHex(base58_to_binary(ipfsCID));
 }
 
 function hashProduct(
@@ -74,7 +63,7 @@ function hashProduct(
       [
         "uint256",
         "address",
-        "bytes32",
+        "bytes",
         "address",
         "uint256",
         "uint256",
@@ -156,6 +145,7 @@ function TransactionButton(props: {
       }),
     };
   } else {
+    console.log("Product exists", productExists);
     if (productExists === undefined) {
       txData = {
         to: zeroAddress,
@@ -367,6 +357,7 @@ function PayButton(props: {
         }
       }}
       buttonType="start"
+      key={1}
     />
   );
 
@@ -541,26 +532,23 @@ async function resolvePrompt(
   }
 
   const productMetadataHash =
-    await hashMetadataRemotely({
+    await saveMetadataRemotely({
       merchantDomain: domain,
       productName: product,
     });
 
-  const encodedProductMetadata =
-    prepareMetadataHashToChain(
-      productMetadataHash
-    );
+  const encodedProductMetadata = minimizeIpfsCID(
+    productMetadataHash
+  );
 
   const subscriptionMetadataHash =
-    await hashMetadataRemotely({
+    await saveMetadataRemotely({
       subscriptionId,
       userId,
     });
 
   const encodedSubscriptionMetadata =
-    prepareMetadataHashToChain(
-      subscriptionMetadataHash
-    );
+    minimizeIpfsCID(subscriptionMetadataHash);
 
   const periodSeconds = timeDaysSeconds(period);
   const periodHuman = timeSecondsToHuman(
@@ -636,7 +624,12 @@ export function Subscribe() {
     }
   }, [prompt, networkHook.chain, switchNetwork]);
 
-  if (!prompt) return <div />;
+  if (!prompt)
+    return (
+      <CoreFrame title="Start a subscription">
+        <p>Loading...</p>
+      </CoreFrame>
+    );
 
   let chainSwitchComponent;
   if (networkHook.chain) {
