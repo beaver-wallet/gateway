@@ -5,6 +5,7 @@ import {
   SupportedChains,
 } from "./constants";
 import { SupportedChain } from "./types";
+import { resolveDomainToAddress } from "./network";
 
 const AmountRegexp = /^$/;
 const PeriodRegexp = /^\d+d$/;
@@ -28,6 +29,9 @@ export function CreateShortcut() {
     useState("");
   const [userId, setUserId] = useState("");
   const [initiator, setInitiator] = useState("");
+  const [errorMessage, setErrorMessage] =
+    useState("");
+  const [loading, setLoading] = useState(false);
 
   const chainDisabled = (chain: SupportedChain) =>
     !Object.keys(
@@ -36,6 +40,15 @@ export function CreateShortcut() {
 
   const chainChecked = (chain: SupportedChain) =>
     selectedChainIds.has(chain.id);
+
+  const onCreateShortcut = async () => {
+    const merchantAddress =
+      resolveDomainToAddress(merchantDomain);
+
+    if (!merchantAddress) {
+      // set;
+    }
+  };
 
   return (
     <div
@@ -231,7 +244,10 @@ export function CreateShortcut() {
           }}
         />
       </div>
-      <button className="mediumButton">
+      <button
+        className="mediumButton"
+        disabled={loading}
+      >
         Create a shortcut!
       </button>
       <div style={{ height: 200 }} />

@@ -24,12 +24,9 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import {
   Hex,
   bytesToHex,
-  concatBytes,
   encodeFunctionData,
   encodePacked,
-  hexToBytes,
   keccak256,
-  zeroAddress,
 } from "viem";
 import { RouterABI } from "./abi";
 import { CoreFrame } from "./CoreFrame";
@@ -45,7 +42,18 @@ import {
 import { base58_to_binary } from "base58-js"; // type: ignore
 
 function minimizeIpfsCID(ipfsCID: string): Hex {
-  return bytesToHex(base58_to_binary(ipfsCID));
+  console.log("IPFS CID", ipfsCID);
+  const binaryIpfsCID: Uint8Array =
+    base58_to_binary(ipfsCID);
+  console.log(
+    "BINARY IPFS CID",
+    binaryIpfsCID,
+    bytesToHex(binaryIpfsCID)
+  );
+
+  // remove IPFS version so that the CID fits in bytes32
+  const minimizedIpfsCID = binaryIpfsCID.slice(2);
+  return bytesToHex(minimizedIpfsCID);
 }
 
 function hashProduct(

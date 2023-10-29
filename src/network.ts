@@ -7,6 +7,7 @@ import {
   encodeFunctionData,
   getAddress,
   getContract,
+  hexToNumber,
   http,
 } from "viem";
 import {
@@ -16,7 +17,6 @@ import {
 import { erc20ABI } from "wagmi";
 import {
   ChainsSettings,
-  EmptyProduct,
   IndexerUrl,
 } from "./constants";
 import {
@@ -262,5 +262,5 @@ export async function queryProductExistsOnChain(
     result.data
   );
 
-  return result.data !== EmptyProduct;
+  return hexToNumber(result.data) !== 0;
 }
