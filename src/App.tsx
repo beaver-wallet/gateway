@@ -84,6 +84,10 @@ function App() {
             element={<Subscribe />}
           />
           <Route
+            path="/subscribe/:shortcutId"
+            element={<Subscribe />}
+          />
+          <Route
             path="/manage"
             element={<ManageList />}
           />

@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import {
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import {
   saveMetadataRemotely,
   queryCurrentAllowance,
   queryCurrentBalance,
   queryProductExistsOnChain,
   resolveDomainToAddress,
+  getShortcutPrompt,
 } from "./network";
 import {
   SubscriptionPrompt,
@@ -198,10 +202,23 @@ function TransactionButton(props: {
     usePrepareSendTransaction(txData);
 
   const sendHook = useSendTransaction(config);
+  const txHash = sendHook.data?.hash;
 
   const waitHook = useWaitForTransaction({
     hash: sendHook.data?.hash,
   });
+
+  const buttonText =
+    props.buttonType === "approve"
+      ? `Approve ${props.prompt.tokenSymbol}`
+      : "Start the subscription";
+  const actionButton = (
+    <button
+      onClick={() => sendHook.sendTransaction!()}
+    >
+      {buttonText}
+    </button>
+  );
 
   if (sendHook.isLoading) {
     return (
@@ -214,46 +231,83 @@ function TransactionButton(props: {
   }
   if (sendHook.isSuccess) {
     if (waitHook.isLoading) {
-      return <p>Waiting for execution...</p>;
+      const etherscanBaseUrl =
+        ChainsSettings[props.chain.id]
+          .etherscanBaseUrl;
+      const etherscanUrl = `${etherscanBaseUrl}/tx/${txHash}`;
+      return (
+        <p>
+          Waiting for execution... Transaction
+          details:{" "}
+          <a
+            href={etherscanUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Etherscan.
+          </a>
+        </p>
+      );
     }
     if (waitHook.isSuccess) {
       props.onExecuted();
       if (props.buttonType === "approve") {
         return <div />;
       } else {
+        const etherscanBaseUrl =
+          ChainsSettings[props.chain.id]
+            .etherscanBaseUrl;
+        const etherscanUrl = `${etherscanBaseUrl}/tx/${txHash}`;
+
+        let text;
+        if (props.prompt.onSuccessUrl) {
+          text =
+            "Success! Redirecting you back to the merchant!";
+        } else {
+          text =
+            "Success! Go back to the merchant website and start enjoying the service!";
+        }
         return (
           <p>
-            Success! Redirecting you back to the
-            merchant!
+            {text} Transaction details:{" "}
+            <a
+              href={etherscanUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Etherscan
+            </a>
           </p>
         );
       }
     }
     if (waitHook.error) {
       return (
-        <p>Error: {waitHook.error.message}</p>
+        <p>
+          Error while subscribing:{" "}
+          {waitHook.error.message}.
+        </p>
       );
     }
   }
   if (sendHook.error) {
-    return <p>Error: {sendHook.error.message}</p>;
+    console.error(
+      "Problem when prompted the user to start a subscription:",
+      sendHook.error.message
+    );
+    return [
+      <p style={{ marginBottom: 8 }}>
+        There was a problem. Please try again.
+      </p>,
+      actionButton,
+    ];
   }
 
   if (productExists === undefined) {
     return <p>Loading...</p>;
   }
 
-  const buttonText =
-    props.buttonType === "approve"
-      ? `Approve ${props.prompt.tokenSymbol}`
-      : "Start the subscription";
-  return (
-    <button
-      onClick={() => sendHook.sendTransaction!()}
-    >
-      {buttonText}
-    </button>
-  );
+  return actionButton;
 }
 
 function PayButton(props: {
@@ -315,7 +369,10 @@ function PayButton(props: {
   )
     return <p>Loading...</p>;
 
-  if (props.prompt.amount > userBalance) {
+  if (
+    props.prompt.amount > userBalance &&
+    props.prompt.freeTrialLengthSeconds === 0
+  ) {
     return [
       <p key={0} style={{ marginBottom: 8 }}>
         Your current balance is {userBalance}{" "}
@@ -324,7 +381,10 @@ function PayButton(props: {
         {props.prompt.tokenSymbol} to start the
         subscription.
       </p>,
-      <button key={1} onClick={updateBalance}>
+      <button
+        key="iToppedUpButton"
+        onClick={updateBalance}
+      >
         I topped up
       </button>,
     ];
@@ -361,7 +421,7 @@ function PayButton(props: {
         }
       }}
       buttonType="start"
-      key={1}
+      key="startButton"
     />
   );
 
@@ -459,55 +519,106 @@ function validateTokenSymbol(
 // Resolves payment prompt from URL search params
 // Throws an error if some of the required params are bad.
 async function resolvePrompt(
+  shortcutId: string | undefined,
   searchParams: URLSearchParams
 ): Promise<SubscriptionPrompt> {
-  // RequiredSearchParams
-  const requiredParams = [
-    "domain",
-    "product",
-    "token",
-    "amount",
-    "period",
-    "chains",
-  ];
+  console.log("shortcutId", shortcutId);
 
-  const missingParams = requiredParams.filter(
-    (param) => !searchParams.get(param)
-  );
+  let domain: string;
+  let product: string;
+  let tokenSymbol: string;
+  let rawAmount: string;
+  let period: string;
+  let serializedChains: string;
+  let freeTrialLength: string;
+  let onSuccessUrl: string | null;
+  let subscriptionId: string | null;
+  let userId: string | null;
+  let initiator: Hex | null;
 
-  if (missingParams.length > 0) {
-    throw new Error(
-      `Missing required parameters: ${missingParams.join(
-        ", "
-      )}`
+  if (shortcutId) {
+    const shortcutPrompt =
+      await getShortcutPrompt(shortcutId);
+
+    if (!shortcutPrompt) {
+      throw new Error(
+        `Shortcut with id ${shortcutId} doesn't exist!!!`
+      );
+    }
+
+    domain = shortcutPrompt.domain;
+    product = shortcutPrompt.product;
+    tokenSymbol = shortcutPrompt.token;
+    rawAmount = shortcutPrompt.amount;
+    period = shortcutPrompt.period;
+    serializedChains = shortcutPrompt.chains;
+    freeTrialLength =
+      shortcutPrompt.freeTrialLength || "0";
+    onSuccessUrl = shortcutPrompt.onSuccessUrl;
+    subscriptionId =
+      shortcutPrompt.subscriptionId;
+    userId = shortcutPrompt.userId;
+    initiator =
+      shortcutPrompt.initiator as Hex | null;
+
+    // Potentially override subscriptionId and userId
+    subscriptionId =
+      searchParams.get("subscriptionId") ||
+      subscriptionId;
+    userId = searchParams.get("userId") || userId;
+    onSuccessUrl =
+      searchParams.get("onSuccessUrl") ||
+      onSuccessUrl;
+  } else {
+    // RequiredSearchParams
+    const requiredParams = [
+      "domain",
+      "product",
+      "token",
+      "amount",
+      "period",
+      "chains",
+    ];
+
+    const missingParams = requiredParams.filter(
+      (param) => !searchParams.get(param)
     );
+
+    if (missingParams.length > 0) {
+      throw new Error(
+        `Missing required parameters: ${missingParams.join(
+          ", "
+        )}`
+      );
+    }
+
+    const paramsValues = requiredParams.map(
+      (param) => searchParams.get(param)!
+    );
+
+    [
+      // Assigning params to variables this way instead of using .get in order to not forget anything when adding or removing params
+      domain,
+      product,
+      tokenSymbol,
+      rawAmount,
+      period,
+      serializedChains,
+    ] = paramsValues;
+
+    freeTrialLength =
+      searchParams.get("freeTrialLength") || "0";
+    onSuccessUrl = searchParams.get(
+      "onSuccessUrl"
+    );
+    subscriptionId = searchParams.get(
+      "subscriptionId"
+    );
+    userId = searchParams.get("userId");
+    initiator = searchParams.get(
+      "initiator"
+    ) as Hex | null;
   }
-
-  const paramsValues = requiredParams.map(
-    (param) => searchParams.get(param)!
-  );
-  const [
-    // Assigning params to variables this way instead of using .get in order to not forget anything when adding or removing params
-    domain,
-    product,
-    tokenSymbol,
-    rawAmount,
-    period,
-    serializedChains,
-  ] = paramsValues;
-
-  const freeTrialLength =
-    searchParams.get("freeTrialLength") || "0";
-  const onSuccessUrl = searchParams.get(
-    "onSuccessUrl"
-  );
-  const subscriptionId = searchParams.get(
-    "subscriptionId"
-  );
-  const userId = searchParams.get("userId");
-  const initiator = searchParams.get(
-    "initiator"
-  ) as Hex | null;
 
   const resolvedTargetAddress =
     await resolveDomainToAddress(domain);
@@ -597,12 +708,17 @@ export function Subscribe() {
   const { open } = useWeb3Modal();
   const networkHook = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
+  const { shortcutId } = useParams();
+  const userAccount = useAccount();
 
   useEffect(() => {
     (async () => {
       try {
         const resolvedPrompt =
-          await resolvePrompt(searchParams);
+          await resolvePrompt(
+            shortcutId,
+            searchParams
+          );
         setPrompt(resolvedPrompt);
       } catch (e) {
         console.error(e);
@@ -706,6 +822,24 @@ export function Subscribe() {
       {chainSwitchComponent}
       {networkHook.chain && (
         <PayButton prompt={prompt} />
+      )}
+      {userAccount.address && (
+        <p
+          style={{
+            fontSize: 14,
+            textAlign: "center",
+            marginTop: "auto",
+          }}
+        >
+          You can unsubscribe at any time at{" "}
+          <a
+            href={`https://gateway.paybeaver.xyz/manage/${userAccount.address}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            your account page.
+          </a>
+        </p>
       )}
     </CoreFrame>
   );

@@ -37,21 +37,61 @@ function TerminateButton(props: {
     }),
   });
   const sendHook = useSendTransaction(config);
+  const txHash = sendHook.data?.hash;
+
   const waitHook = useWaitForTransaction({
     hash: sendHook.data?.hash,
   });
+  const actionButton = (
+    <button
+      key={"actionButton"}
+      onClick={() => sendHook.sendTransaction!()}
+    >
+      Terminate subscription
+    </button>
+  );
 
   if (sendHook.isLoading) {
     return <p>Terminating...</p>;
   }
   if (sendHook.isSuccess) {
     if (waitHook.isLoading) {
-      return <p>Waiting for execution...</p>;
+      const etherscanBaseUrl =
+        ChainsSettings[
+          props.subscription.product.chain.id
+        ].etherscanBaseUrl;
+      const etherscanUrl = `${etherscanBaseUrl}/tx/${txHash}`;
+      return (
+        <p>
+          Waiting for execution... Transaction
+          details:{" "}
+          <a
+            href={etherscanUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Etherscan.
+          </a>
+        </p>
+      );
     }
     if (waitHook.isSuccess) {
+      const etherscanBaseUrl =
+        ChainsSettings[
+          props.subscription.product.chain.id
+        ].etherscanBaseUrl;
+      const etherscanUrl = `${etherscanBaseUrl}/tx/${txHash}`;
       return (
         <p>
           Success! Terminated the subscription!
+          Transaction details:{" "}
+          <a
+            href={etherscanUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Etherscan.
+          </a>
         </p>
       );
     }
@@ -62,7 +102,16 @@ function TerminateButton(props: {
     }
   }
   if (sendHook.error) {
-    return <p>Error: {sendHook.error.message}</p>;
+    console.error(
+      "Problem when prompted the user to terminate a subscription:",
+      sendHook.error.message
+    );
+    return [
+      <p style={{ marginBottom: 8 }}>
+        There was a problem. Please try again.
+      </p>,
+      actionButton,
+    ];
   }
 
   if (!chain) {
@@ -133,12 +182,7 @@ function TerminateButton(props: {
       To terminate subscription, send a
       transaction
     </p>,
-    <button
-      key={1}
-      onClick={() => sendHook.sendTransaction!()}
-    >
-      Terminate subscription
-    </button>,
+    actionButton,
   ];
 }
 

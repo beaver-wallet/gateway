@@ -75,6 +75,12 @@ export function normalizeChainName(
     .replaceAll(" ", "-");
 }
 
+export function chainToNormalizedName(
+  chain: SupportedChain
+): string {
+  return normalizeChainName(chain.name);
+}
+
 export function getChainByName(
   chainName: string
 ): SupportedChain | null {

@@ -11,6 +11,7 @@ import {
   http,
 } from "viem";
 import {
+  ShortcutPrompt,
   Subscription,
   SupportedChain,
 } from "./types";
@@ -85,7 +86,11 @@ export async function resolveDomainToAddress(
   const response = await fetch(
     `https://dns.google/resolve?name=${domain}&type=txt`
   );
+  if (response.status !== 200) return undefined;
+
   const json = await response.json();
+  if (json.Status !== 0) return undefined; // json.Status is Google-specific status code
+
   const txtRecords: string[] = json.Answer.map(
     (a: any) => a.data
   );
@@ -263,4 +268,29 @@ export async function queryProductExistsOnChain(
   );
 
   return hexToNumber(result.data) !== 0;
+}
+
+export async function makeShortcutRemotely(
+  shortcuted: ShortcutPrompt
+): Promise<string> {
+  const response = await fetch(
+    `${IndexerUrl}/shortcut`,
+    {
+      body: JSON.stringify(shortcuted),
+      method: "POST",
+    }
+  );
+
+  const result = await response.text();
+  return result.replaceAll('"', ""); // remove quotes
+}
+
+export async function getShortcutPrompt(
+  shortcutId: string
+): Promise<ShortcutPrompt | null> {
+  const response = await fetch(
+    `${IndexerUrl}/shortcut/${shortcutId}`
+  );
+  if (response.status !== 200) return null;
+  return (await response.json()) as ShortcutPrompt;
 }

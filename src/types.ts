@@ -13,6 +13,8 @@ export type SupportedChainIdsType =
 export type ChainsSettingsType = Record<
   SupportedChainIdsType,
   {
+    chain: SupportedChain;
+    etherscanBaseUrl: string;
     routerAddress: Hex;
     rpc: string;
     tokens: Record<
@@ -75,4 +77,18 @@ export interface Subscription {
   status: string;
   isActive: boolean;
   nextPaymentAt: number;
+}
+
+export interface ShortcutPrompt {
+  domain: string;
+  product: string;
+  token: string;
+  amount: string;
+  period: string;
+  chains: string;
+  freeTrialLength: string | null;
+  onSuccessUrl: string | null;
+  subscriptionId: string | null;
+  userId: string | null;
+  initiator: string | null;
 }

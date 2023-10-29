@@ -2,6 +2,10 @@ p {
   margin: 0;
 }
 
+a {
+  color: blue;
+}
+
 button {
   padding: 8px;
   border-radius: 8px;
@@ -51,7 +55,7 @@ input {
 }
 
 .shortcutFormContainer {
-  width: 480px;
+  max-width: 480px;
   margin-bottom: 8px;
 }
 

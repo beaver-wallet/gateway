@@ -29,6 +29,9 @@ export const PaymentPeriod =
 export const ChainsSettings: ChainsSettingsType =
   {
     [sepolia.id]: {
+      chain: sepolia,
+      etherscanBaseUrl:
+        "https://sepolia.etherscan.io/",
       rpc: "https://eth-sepolia-public.unifra.io",
       routerAddress:
         "0x46a432Ee69881Af9067C23AE7680912245A7fF52",
@@ -46,6 +49,9 @@ export const ChainsSettings: ChainsSettingsType =
       },
     },
     [polygonMumbai.id]: {
+      chain: polygonMumbai,
+      etherscanBaseUrl:
+        "https://mumbai.polygonscan.com/",
       rpc: "https://rpc.ankr.com/polygon_mumbai",
       routerAddress:
         "0xbE247668C131b913baDa67E76f9cb219EBa8764c",
