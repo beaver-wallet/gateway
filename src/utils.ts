@@ -22,7 +22,7 @@ export const HumanAndSecondsPeriods: [
 ];
 
 // Take a number of seconds and converts it to a human-readable such as
-// "1 month"
+// "month", "2 weeks", etc.
 export function timeSecondsToHuman(
   secondsAmount: number
 ): string {

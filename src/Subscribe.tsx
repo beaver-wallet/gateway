@@ -853,6 +853,12 @@ export function Subscribe() {
         {prompt.amount} {prompt.tokenSymbol} per{" "}
         {prompt.periodHuman}
       </p>
+      {prompt.freeTrialLengthSeconds > 0 && (
+        <p>
+          Free trial:{" "}
+          {prompt.freeTrialLengthHuman}
+        </p>
+      )}
       {!networkHook.chain && (
         <button
           onClick={() => open()}
