@@ -854,9 +854,10 @@ export function Subscribe() {
         {prompt.periodHuman}
       </p>
       {prompt.freeTrialLengthSeconds > 0 && (
-        <p>
-          Free trial:{" "}
-          {prompt.freeTrialLengthHuman}
+        <p style={{ marginBottom: 8 }}>
+          This subscription includes{" "}
+          {prompt.freeTrialLengthHuman} of free
+          trial.
         </p>
       )}
       {!networkHook.chain && (
