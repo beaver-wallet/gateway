@@ -104,6 +104,8 @@ function TransactionButton(props: {
 }) {
   const [productExists, setProductExists] =
     useState<boolean>();
+  const [amountToApprove, setAmountToApprove] =
+    useState<number>();
 
   const tokenProps =
     ChainsSettings[props.chain.id].tokens[
@@ -150,9 +152,8 @@ function TransactionButton(props: {
         functionName: "approve",
         args: [
           routerAddress,
-          props.prompt.amount *
-            10 ** tokenProps.decimals *
-            1000,
+          (amountToApprove || 0) *
+            10 ** tokenProps.decimals,
         ],
       }),
     };
@@ -215,6 +216,11 @@ function TransactionButton(props: {
   const actionButton = (
     <button
       onClick={() => sendHook.sendTransaction!()}
+      disabled={
+        props.buttonType === "approve" &&
+        (amountToApprove || 0) <
+          props.prompt.amount
+      }
     >
       {buttonText}
     </button>
@@ -305,6 +311,42 @@ function TransactionButton(props: {
 
   if (productExists === undefined) {
     return <p>Loading...</p>;
+  }
+
+  if (props.buttonType === "approve") {
+    return [
+      <p key={0} style={{ marginBottom: 8 }}>
+        Tokens are taken from your wallet only
+        when the time is right for a payment. But
+        it's not possible if you don't approve
+        them to be taken. Your approval (in{" "}
+        {props.prompt.tokenSymbol}):
+      </p>,
+      <input
+        key={1}
+        type="number"
+        placeholder={(
+          props.prompt.amount * 100
+        ).toString()}
+        value={amountToApprove}
+        onChange={(event) =>
+          setAmountToApprove(
+            parseFloat(event.target.value)
+          )
+        }
+        style={{ maxWidth: 160 }}
+      />,
+      amountToApprove ? (
+        <p key={2} style={{ marginBottom: 8 }}>
+          This will cover{" "}
+          {Math.floor(
+            amountToApprove / props.prompt.amount
+          )}{" "}
+          payments.
+        </p>
+      ) : null,
+      actionButton,
+    ];
   }
 
   return actionButton;
