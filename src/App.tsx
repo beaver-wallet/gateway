@@ -10,7 +10,6 @@ import {
   createConfig,
 } from "wagmi";
 import { Home } from "./Home";
-import { createWeb3Modal } from "@web3modal/wagmi/react";
 import { ManageList } from "./ManageList";
 import {
   ChainsSettings,
@@ -19,14 +18,13 @@ import {
 import { ManageSingle } from "./ManageSingle";
 import { All } from "./All";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
-import { InjectedConnector } from "wagmi/connectors/injected";
-import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { SupportedChainIdsType } from "./types";
 import { CreateShortcut } from "./CreateShortcut";
-
-// Wallet connect project id
-export const projectId =
-  "e73fed4f49cb7c0d4ab26cf055465dcc";
+import "@rainbow-me/rainbowkit/styles.css";
+import {
+  getDefaultWallets,
+  RainbowKitProvider,
+} from "@rainbow-me/rainbowkit";
 
 export const metadata = {
   name: "Beaver Subscriptions Gateway",
@@ -51,65 +49,59 @@ const { chains, publicClient } = configureChains(
   ]
 );
 
-export const wagmiConfig = createConfig({
-  publicClient,
-  connectors: [
-    new InjectedConnector({ chains }),
-    new WalletConnectConnector({
-      chains,
-      options: {
-        projectId,
-        metadata,
-        showQrModal: false,
-      },
-    }),
-  ],
+const { connectors } = getDefaultWallets({
+  appName: "Beaver Crypto Subscriptions",
+  projectId: "YOUR_PROJECT_ID",
+  chains,
 });
 
-createWeb3Modal({
-  wagmiConfig,
-  projectId,
-  chains: SupportedChains,
-  defaultChain: SupportedChains[0],
+export const wagmiConfig = createConfig({
+  publicClient,
+  connectors,
 });
 
 function App() {
   return (
     <WagmiConfig config={wagmiConfig}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route
-            path="/subscribe"
-            element={<Subscribe />}
-          />
-          <Route
-            path="/subscribe/:shortcutId"
-            element={<Subscribe />}
-          />
-          <Route
-            path="/manage"
-            element={<ManageList />}
-          />
-          <Route
-            path="/manage/:address"
-            element={<ManageList />}
-          />
-          <Route
-            path="/subscription"
-            element={<ManageSingle />}
-          />
-          <Route
-            path="/subscription/:subscriptionHash"
-            element={<ManageSingle />}
-          />
-          <Route path="/all" element={<All />} />
-          <Route
-            path="/shortcut"
-            element={<CreateShortcut />}
-          />
-        </Routes>
-      </BrowserRouter>
+      <RainbowKitProvider chains={chains}>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route
+              path="/subscribe"
+              element={<Subscribe />}
+            />
+            <Route
+              path="/subscribe/:shortcutId"
+              element={<Subscribe />}
+            />
+            <Route
+              path="/manage"
+              element={<ManageList />}
+            />
+            <Route
+              path="/manage/:address"
+              element={<ManageList />}
+            />
+            <Route
+              path="/subscription"
+              element={<ManageSingle />}
+            />
+            <Route
+              path="/subscription/:subscriptionHash"
+              element={<ManageSingle />}
+            />
+            <Route
+              path="/all"
+              element={<All />}
+            />
+            <Route
+              path="/shortcut"
+              element={<CreateShortcut />}
+            />
+          </Routes>
+        </BrowserRouter>
+      </RainbowKitProvider>
     </WagmiConfig>
   );
 }

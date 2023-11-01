@@ -43,7 +43,6 @@ export interface SubscriptionPrompt {
   freeTrialLengthSeconds: number;
   productMetadataCID: Hex;
   subscriptionMetadataCID: Hex;
-  initiator: Hex | null;
 }
 
 export interface Product {
@@ -90,5 +89,4 @@ export interface ShortcutPrompt {
   onSuccessUrl: string | null;
   subscriptionId: string | null;
   userId: string | null;
-  initiator: string | null;
 }

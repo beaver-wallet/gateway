@@ -12,9 +12,9 @@ import {
   useSwitchNetwork,
   useWaitForTransaction,
 } from "wagmi";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { RouterABI } from "./abi";
 import { ChainsSettings } from "./constants";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 function TerminateButton(props: {
   subscription: Subscription;
@@ -22,7 +22,7 @@ function TerminateButton(props: {
   const { chain } = useNetwork();
   const userAccount = useAccount();
   const { switchNetwork } = useSwitchNetwork();
-  const { open } = useWeb3Modal();
+  const { openConnectModal } = useConnectModal();
   const { config } = usePrepareSendTransaction({
     to: ChainsSettings[
       props.subscription.product.chain.id
@@ -120,7 +120,10 @@ function TerminateButton(props: {
         To terminate subscription, connect your
         wallet
       </p>,
-      <button onClick={() => open()} key={1}>
+      <button
+        onClick={() => openConnectModal!()}
+        key={1}
+      >
         Connect Wallet
       </button>,
     ];

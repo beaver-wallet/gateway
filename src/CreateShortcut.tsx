@@ -40,7 +40,6 @@ export function CreateShortcut() {
   const [subscriptionId, setSubscriptionId] =
     useState("");
   const [userId, setUserId] = useState("");
-  const [initiator, setInitiator] = useState("");
   const [errorMessage, setErrorMessage] =
     useState("");
   const [loading, setLoading] = useState(false);
@@ -105,15 +104,6 @@ export function CreateShortcut() {
       );
     }
 
-    if (
-      initiator.length !== 0 &&
-      !isAddress(initiator)
-    ) {
-      throw new Error(
-        "Initiator must either be not specified or contain a valid Ethereum address. Example: 0x34207C538E39F2600FE672bB84A90efF190ae4C7."
-      );
-    }
-
     const chainNames = [...selectedChainIds].map(
       (chainId) =>
         chainToNormalizedName(
@@ -142,10 +132,6 @@ export function CreateShortcut() {
             : subscriptionId,
         userId:
           userId.length === 0 ? null : userId,
-        initiator:
-          initiator.length === 0
-            ? null
-            : initiator,
       }
     );
     console.log(
@@ -390,19 +376,6 @@ export function CreateShortcut() {
           value={userId}
           onChange={(event) => {
             setUserId(event.target.value);
-          }}
-        />
-        <p>
-          Optional. Advanced. Initiator. What
-          blockchain address is permitted to
-          initiate subscription payments.
-        </p>
-        <input
-          type="text"
-          placeholder="0x34207C538E39F2600FE672bB84A90efF190ae4C7"
-          value={initiator}
-          onChange={(event) => {
-            setInitiator(event.target.value);
           }}
         />
         {errorMessage && (

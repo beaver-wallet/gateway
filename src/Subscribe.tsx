@@ -24,7 +24,6 @@ import {
   useSwitchNetwork,
   useWaitForTransaction,
 } from "wagmi";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 import {
   Hex,
   bytesToHex,
@@ -44,6 +43,10 @@ import {
   timeSecondsToHuman,
 } from "./utils";
 import { base58_to_binary } from "base58-js"; // type: ignore
+import {
+  ConnectButton,
+  useConnectModal,
+} from "@rainbow-me/rainbowkit";
 
 function minimizeIpfsCID(ipfsCID: string): Hex {
   console.log("IPFS CID", ipfsCID);
@@ -576,7 +579,6 @@ async function resolvePrompt(
   let onSuccessUrl: string | null;
   let subscriptionId: string | null;
   let userId: string | null;
-  let initiator: Hex | null;
 
   if (shortcutId) {
     const shortcutPrompt =
@@ -600,8 +602,6 @@ async function resolvePrompt(
     subscriptionId =
       shortcutPrompt.subscriptionId;
     userId = shortcutPrompt.userId;
-    initiator =
-      shortcutPrompt.initiator as Hex | null;
 
     // Potentially override subscriptionId and userId
     subscriptionId =
@@ -657,9 +657,6 @@ async function resolvePrompt(
       "subscriptionId"
     );
     userId = searchParams.get("userId");
-    initiator = searchParams.get(
-      "initiator"
-    ) as Hex | null;
   }
 
   const resolvedTargetAddress =
@@ -736,7 +733,6 @@ async function resolvePrompt(
     productMetadataCID: encodedProductMetadata,
     subscriptionMetadataCID:
       encodedSubscriptionMetadata,
-    initiator,
   };
   console.log("Got subscription prompt", prompt);
 
@@ -747,11 +743,11 @@ export function Subscribe() {
   let [searchParams] = useSearchParams();
   const [prompt, setPrompt] =
     useState<SubscriptionPrompt>();
-  const { open } = useWeb3Modal();
   const networkHook = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
   const { shortcutId } = useParams();
   const userAccount = useAccount();
+  const { openConnectModal } = useConnectModal();
 
   useEffect(() => {
     (async () => {
@@ -862,7 +858,7 @@ export function Subscribe() {
       )}
       {!networkHook.chain && (
         <button
-          onClick={() => open()}
+          onClick={() => openConnectModal!()}
           style={{ marginBottom: 8 }}
         >
           Connect wallet
