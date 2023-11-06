@@ -97,11 +97,6 @@ export const ChainsSettings: ChainsSettingsType =
             "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
           decimals: 6,
         },
-        EURS: {
-          address:
-            "0xE111178A87A3BFf0c8d18DECBa5798827539Ae99",
-          decimals: 2,
-        },
       },
     },
     [base.id]: {
