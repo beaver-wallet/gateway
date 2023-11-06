@@ -16,8 +16,16 @@ export const SupportedChains = [
   base,
 ];
 
+export const ProductionChains =
+  SupportedChains.filter(
+    (chain) => !(chain as any).testnet
+  );
+
 export const SupportedChainIds =
   SupportedChains.map((chain) => chain.id);
+
+export const ProductionChainIds =
+  ProductionChains.map((chain) => chain.id);
 
 export let IndexerUrl: string;
 if (
@@ -114,19 +122,3 @@ export const ChainsSettings: ChainsSettingsType =
       },
     },
   };
-
-const AvailableTokensSet = SupportedChainIds.map(
-  (chainId) =>
-    new Set(
-      Object.keys(ChainsSettings[chainId].tokens)
-    )
-).reduce(
-  (accumulated, current) =>
-    new Set([...accumulated, ...current])
-);
-
-export const AvailableTokens = [
-  ...AvailableTokensSet,
-];
-
-console.log("Available tokens:", AvailableTokens);

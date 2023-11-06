@@ -1,4 +1,7 @@
-import { SupportedChains } from "./constants";
+import {
+  ChainsSettings,
+  SupportedChains,
+} from "./constants";
 import { SupportedChain } from "./types";
 
 export const MinuteInSeconds = 60;
@@ -97,4 +100,24 @@ export function getChainByName(
   }
 
   return null;
+}
+
+export function getAvailableTokensSymbols(
+  chains: SupportedChain[]
+): string[] {
+  const tokensSet = chains
+    .map(
+      (chain) =>
+        new Set(
+          Object.keys(
+            ChainsSettings[chain.id].tokens
+          )
+        )
+    )
+    .reduce(
+      (accumulated, current) =>
+        new Set([...accumulated, ...current])
+    );
+
+  return [...tokensSet];
 }

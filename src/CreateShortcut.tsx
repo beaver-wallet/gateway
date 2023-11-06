@@ -1,8 +1,7 @@
 import { useState } from "react";
 import {
-  AvailableTokens as AvailableTokensSymbols,
   ChainsSettings,
-  SupportedChains,
+  ProductionChains,
 } from "./constants";
 import {
   SupportedChain,
@@ -12,8 +11,10 @@ import {
   makeShortcutRemotely,
   resolveDomainToAddress,
 } from "./network";
-import { isAddress } from "viem";
-import { chainToNormalizedName } from "./utils";
+import {
+  chainToNormalizedName,
+  getAvailableTokensSymbols,
+} from "./utils";
 
 const AmountRegexp = /^\d+(\.\d+)?$/;
 const PeriodRegexp = /^\d+d$/;
@@ -242,17 +243,18 @@ export function CreateShortcut() {
           <option value="" key="" disabled>
             Select a token
           </option>
-          {AvailableTokensSymbols.map(
-            (tokenSymbol) => (
-              <option
-                value={tokenSymbol}
-                key={tokenSymbol}
-              >
-                {tokenSymbol}
-              </option>
-            )
-          )}
+          {getAvailableTokensSymbols(
+            ProductionChains
+          ).map((tokenSymbol) => (
+            <option
+              value={tokenSymbol}
+              key={tokenSymbol}
+            >
+              {tokenSymbol}
+            </option>
+          ))}
         </select>
+
         <p>
           Amount of tokens charged every billing
           period.
@@ -280,12 +282,11 @@ export function CreateShortcut() {
         <div>
           <p>
             Blockchains to accept payments on.
-            Note: some blockchains may be
-            unavailable depending on the selected
-            token.
+            Some blockchains may be unavailable
+            depending on the selected token.
           </p>
 
-          {SupportedChains.map((chain) => (
+          {ProductionChains.map((chain) => (
             <div key={chain.id}>
               <input
                 type="checkbox"
