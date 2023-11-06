@@ -1,6 +1,9 @@
 import {
   sepolia,
   polygonMumbai,
+  baseGoerli,
+  polygon,
+  base,
 } from "wagmi/chains";
 import { ChainsSettingsType } from "./types";
 import { timeDaysSeconds } from "./utils";
@@ -8,6 +11,9 @@ import { timeDaysSeconds } from "./utils";
 export const SupportedChains = [
   sepolia,
   polygonMumbai,
+  baseGoerli,
+  polygon,
+  base,
 ];
 
 export const SupportedChainIds =
@@ -34,7 +40,7 @@ export const ChainsSettings: ChainsSettingsType =
         "https://sepolia.etherscan.io/",
       rpc: "https://eth-sepolia-public.unifra.io",
       routerAddress:
-        "0x46a432Ee69881Af9067C23AE7680912245A7fF52",
+        "0x748FC43a4218f28CB6CD99F60c30Fcc09eA4E5f9",
       tokens: {
         USDT: {
           address:
@@ -54,11 +60,60 @@ export const ChainsSettings: ChainsSettingsType =
         "https://mumbai.polygonscan.com/",
       rpc: "https://rpc.ankr.com/polygon_mumbai",
       routerAddress:
-        "0xbE247668C131b913baDa67E76f9cb219EBa8764c",
+        "0x748FC43a4218f28CB6CD99F60c30Fcc09eA4E5f9",
       tokens: {
         USDT: {
           address:
             "0x1fdE0eCc619726f4cD597887C9F3b4c8740e19e2",
+          decimals: 6,
+        },
+      },
+    },
+    [baseGoerli.id]: {
+      chain: baseGoerli,
+      etherscanBaseUrl:
+        "https://goerli.basescan.org/",
+      rpc: "https://goerli.base.org",
+      routerAddress:
+        "0x748FC43a4218f28CB6CD99F60c30Fcc09eA4E5f9",
+      tokens: {
+        COMP: {
+          address:
+            "0xA29b548056c3fD0f68BAd9d4829EC4E66f22f796",
+          decimals: 18,
+        },
+      },
+    },
+    [polygon.id]: {
+      chain: polygon,
+      etherscanBaseUrl:
+        "https://polygonscan.com/",
+      rpc: "https://polygon.llamarpc.com",
+      routerAddress:
+        "0x748FC43a4218f28CB6CD99F60c30Fcc09eA4E5f9",
+      tokens: {
+        USDT: {
+          address:
+            "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+          decimals: 6,
+        },
+        EURS: {
+          address:
+            "0xE111178A87A3BFf0c8d18DECBa5798827539Ae99",
+          decimals: 2,
+        },
+      },
+    },
+    [base.id]: {
+      chain: base,
+      etherscanBaseUrl: "https://basescan.org/",
+      rpc: "https://mainnet.base.org",
+      routerAddress:
+        "0x27bFF737b405a4C540001BDF9CC184c3392b1733",
+      tokens: {
+        USDC: {
+          address:
+            "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
           decimals: 6,
         },
       },

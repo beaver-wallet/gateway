@@ -78,22 +78,22 @@ function hashProduct(
       [
         "uint256",
         "address",
-        "bytes",
         "address",
         "uint256",
-        "uint256",
-        "uint256",
-        "uint256",
+        "uint40",
+        "uint40",
+        "uint40",
+        "bytes32",
       ],
       [
         BigInt(chain.id),
         merchant,
-        productMetadata,
         tokenAddress,
         BigInt(uintAmount),
-        BigInt(period),
-        BigInt(freeTrialLength),
-        BigInt(paymentPeriod),
+        period,
+        freeTrialLength,
+        paymentPeriod,
+        productMetadata,
       ]
     )
   );
@@ -176,12 +176,12 @@ function TransactionButton(props: {
             "setupEnvironmentAndStartSubscription",
           args: [
             props.prompt.merchantAddress,
-            props.prompt.productMetadataCID,
             tokenProps.address,
             uintAmount,
             props.prompt.periodSeconds,
             props.prompt.freeTrialLengthSeconds,
             PaymentPeriod,
+            props.prompt.productMetadataCID,
             props.prompt.subscriptionMetadataCID,
           ],
         }),
@@ -319,11 +319,8 @@ function TransactionButton(props: {
   if (props.buttonType === "approve") {
     return [
       <p key={0} style={{ marginBottom: 8 }}>
-        Tokens are taken from your wallet only
-        when the time is right for a payment. But
-        it's not possible if you don't approve
-        them to be taken. Your approval (in{" "}
-        {props.prompt.tokenSymbol}):
+        Approve {props.prompt.tokenSymbol} to be
+        spent.
       </p>,
       <input
         key={1}
@@ -341,7 +338,7 @@ function TransactionButton(props: {
       />,
       amountToApprove ? (
         <p key={2} style={{ marginBottom: 8 }}>
-          This will cover{" "}
+          This will be enough to cover{" "}
           {Math.floor(
             amountToApprove / props.prompt.amount
           )}{" "}

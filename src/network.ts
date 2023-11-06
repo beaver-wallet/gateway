@@ -30,7 +30,7 @@ const BeaverDnsKey = "beaver-ethereum-address=";
 
 function getClientForChain(
   chain: SupportedChain
-): PublicClient<Transport, Chain> {
+): PublicClient<Transport, SupportedChain> {
   // const rpc = ChainsSettings[chain.id].rpc;
 
   return createPublicClient({
