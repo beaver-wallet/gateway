@@ -26,6 +26,7 @@ import {
   ConnectButton,
   TerminateSubscription,
 } from "./ActionButtons";
+import { GatewayUrl } from "../constants";
 
 function ComputedSubscriptionInfo(props: {
   subscription: Subscription;
@@ -239,7 +240,10 @@ export function ManageSingle() {
   }
 
   return (
-    <CoreFrame title="Manage Subscription">
+    <CoreFrame
+      title="Manage Subscription"
+      backPath={`/manage/${subscription.userAddress}`}
+    >
       <ComputedSubscriptionInfo
         subscription={subscription}
         onTerminate={() => {
