@@ -1,4 +1,4 @@
-import { Hex } from "viem";
+import { Chain, Hex } from "viem";
 import {
   SupportedChainIds,
   SupportedChains,
@@ -89,4 +89,17 @@ export interface ShortcutPrompt {
   onSuccessUrl: string | null;
   subscriptionId: string | null;
   userId: string | null;
+}
+
+export interface UserData {
+  address: Hex;
+  shortAddress: Hex;
+  chain: Chain;
+  validChain: SupportedChain | undefined;
+  switchChain: (chainId: number) => void;
+}
+
+export interface UserFinancials {
+  humanBalance: number;
+  humanAllowance: number;
 }

@@ -3,7 +3,7 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
-import { Subscribe } from "./Subscribe";
+import { Subscribe } from "./Subscription/Subscribe";
 import {
   WagmiConfig,
   configureChains,

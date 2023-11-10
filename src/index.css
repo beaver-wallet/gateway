@@ -1,65 +1,114 @@
-p {
+@font-face {
+  font-family: "OxygenMono";
+  src: local("OxygenMono"),
+    url(./OxygenMono-Regular.ttf)
+      format("truetype");
+}
+
+* {
+  font-family: OxygenMono;
+  color: black;
+  font-size: 16px;
   margin: 0;
 }
 
+input {
+  padding: 4px;
+}
+
 a {
-  color: blue;
+  text-decoration: underline;
 }
 
 button {
-  padding: 8px;
-  border-radius: 8px;
-  background-color: #00000011;
-  border-width: 0;
-}
-
-.mediumButton {
-  padding: 12px;
-  font-size: 14px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  background: none;
+  border: 1px solid black;
 }
 
 button:hover {
-  background-color: #00000022;
+  color: white;
+  border-color: white;
+  background-color: black;
 }
 
 select {
-  padding: 4px;
-  border-radius: 8px;
-  background-color: #00000011;
-  border-width: 0;
+  /* border: none; */
+  /* width: fit-content; */
+  /* padding: 0px; */
 }
 
-select:hover {
-  background-color: #00000022;
-}
-
-input {
-  width: 100%;
-  margin-bottom: 8px;
-  padding: 8px;
-  border-radius: 4px;
-  background-color: #00000011;
-  border-width: 0px;
-}
-
-.subscriptionListElement {
+.title1Font {
+  font-size: 24px;
   padding: 16px;
-  background-color: #00000011;
-  margin-bottom: 16px;
+}
+
+.title2Font {
+  font-size: 20px;
+}
+
+.contentFont {
+  font-size: 16px;
+}
+
+.minor1Font {
+  font-size: 12px;
+}
+
+.minor2Font {
+  font-size: 8px;
+}
+
+.rootContainer {
+  height: 84vh;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+.centralizingContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.cardContainer {
+  padding: 16px;
+  border: 1px solid black;
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+  width: 400px;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.centralText {
+  text-align: center;
   width: 100%;
-  border-radius: 16px;
 }
 
-.subscriptionListElement:hover {
-  background-color: #00000022;
+.verticalFlex {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.shortcutFormContainer {
-  max-width: 480px;
-  margin-bottom: 8px;
+.subscriptionLine {
+  width: 100%;
+  display: flex;
 }
 
-.shortcutFormContainer p {
-  padding-top: 8px;
-  padding-bottom: 4px;
+.lineFiller {
+  display: inline-block;
+  flex-grow: 1;
+  border-bottom: 2px dotted black;
+  margin-bottom: 4px;
 }

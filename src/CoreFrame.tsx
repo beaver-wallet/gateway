@@ -9,62 +9,40 @@ export function CoreFrame(props: {
 }) {
   const navigate = useNavigate();
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: "white",
-          width: "400px",
-          height: "60vh",
-          marginTop: "10vh",
-          boxShadow: `0px 0px 4px 0px grey`,
-          borderRadius: "20px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          paddingTop: 16,
-          paddingBottom: 16,
-          paddingLeft:
-            props.paddingHorizontal ?? 16,
-          paddingRight:
-            props.paddingHorizontal ?? 16,
-          overflowY: "scroll",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-evenly",
-            width: "100%",
-          }}
-        >
-          {props.backPath ? (
-            <div
-              onClick={() =>
-                navigate(props.backPath as any)
-              }
-            >
-              <GoBackIcon active={true} />
-            </div>
-          ) : (
-            <GoBackIcon active={false} /> // just to fill the space
-          )}
-          <p
-            style={{
-              fontSize: 24,
-              marginBottom: 16,
-            }}
-          >
-            {props.title}
-          </p>
-          <div />
+    <div className="rootContainer">
+      <p className="title1Font">PayBeaver</p>
+      <div className="centralizingContainer">
+        <div className="cardContainer">
+          <div className="cardHeader">
+            {props.backPath ? (
+              <div
+                onClick={() =>
+                  navigate(props.backPath as any)
+                }
+              >
+                <GoBackIcon active={true} />
+              </div>
+            ) : (
+              <GoBackIcon active={false} /> // just to fill the space
+            )}
+            <p className="title2Font">
+              {props.title}
+            </p>
+            <div />
+          </div>
+          {props.children}
         </div>
-        {props.children}
       </div>
+      <p className="minor2Font centralText">
+        Made by Alexey Nebolsin{" "}
+        <a
+          href="https://twitter.com/nebolax"
+          className="minor2Font"
+        >
+          @nebolax
+        </a>
+        .
+      </p>
     </div>
   );
 }

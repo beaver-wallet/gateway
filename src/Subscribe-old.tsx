@@ -43,10 +43,7 @@ import {
   timeSecondsToHuman,
 } from "./utils";
 import { base58_to_binary } from "base58-js"; // type: ignore
-import {
-  ConnectButton,
-  useConnectModal,
-} from "@rainbow-me/rainbowkit";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 function minimizeIpfsCID(ipfsCID: string): Hex {
   console.log("IPFS CID", ipfsCID);
@@ -736,7 +733,7 @@ async function resolvePrompt(
   return prompt;
 }
 
-export function Subscribe() {
+export function SubscribeOld() {
   let [searchParams] = useSearchParams();
   const [prompt, setPrompt] =
     useState<SubscriptionPrompt>();

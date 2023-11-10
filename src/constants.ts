@@ -28,13 +28,16 @@ export const ProductionChainIds =
   ProductionChains.map((chain) => chain.id);
 
 export let IndexerUrl: string;
+export let GatewayUrl: string;
 if (
   !process.env.NODE_ENV ||
   process.env.NODE_ENV === "development"
 ) {
   IndexerUrl = "http://127.0.0.1:8000";
+  GatewayUrl = "https://localhost:3000";
 } else {
   IndexerUrl = "https://api.paybeaver.xyz";
+  GatewayUrl = "https://gateway.paybeaver.xyz";
 }
 
 export const PaymentPeriod =

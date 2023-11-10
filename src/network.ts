@@ -1,5 +1,4 @@
 import {
-  Chain,
   Hex,
   PublicClient,
   Transport,
@@ -154,7 +153,7 @@ export async function queryCurrentAllowance(
   }
 }
 
-// Returns current balance for the given token. In human readable format.
+// Returns current user's balance for the given token. In human readable format.
 export async function queryCurrentBalance(
   chain: SupportedChain,
   tokenSymbol: string,
