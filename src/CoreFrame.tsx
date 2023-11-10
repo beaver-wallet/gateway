@@ -33,7 +33,7 @@ export function CoreFrame(props: {
           {props.children}
         </div>
       </div>
-      <p className="minor2Font centralText">
+      <p className="minor2Font footer centralText">
         Made by Alexey Nebolsin{" "}
         <a
           href="https://twitter.com/nebolax"

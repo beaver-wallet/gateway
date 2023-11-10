@@ -39,7 +39,7 @@ function SingleSubscriptionElement(props: {
 
   return (
     <div
-      className="manageListElement"
+      className="manageListElement verticalFlex"
       onClick={() => {
         navigate(
           "/subscription/" +

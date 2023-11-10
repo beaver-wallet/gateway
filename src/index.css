@@ -40,7 +40,7 @@ button:hover {
 }
 
 .title1Font {
-  font-size: 24px;
+  font-size: 22px;
   padding: 16px;
 }
 
@@ -57,7 +57,7 @@ button:hover {
 }
 
 .minor2Font {
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .rootContainer {
@@ -179,4 +179,13 @@ button:hover {
 .manageListElement:hover {
   padding: 15px;
   border: 1px solid black;
+}
+
+.footer {
+  position: fixed;
+  bottom: 16px;
+
+  /* And if you want the div to be full-width: */
+  left: 0;
+  right: 0;
 }
