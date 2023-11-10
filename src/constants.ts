@@ -34,7 +34,7 @@ if (
   process.env.NODE_ENV === "development"
 ) {
   IndexerUrl = "http://127.0.0.1:8000";
-  GatewayUrl = "https://localhost:3000";
+  GatewayUrl = "http://localhost:3000";
 } else {
   IndexerUrl = "https://api.paybeaver.xyz";
   GatewayUrl = "https://gateway.paybeaver.xyz";

@@ -10,12 +10,12 @@ import {
   createConfig,
 } from "wagmi";
 import { Home } from "./Home";
-import { ManageList } from "./ManageList";
+import { ManageList } from "./Subscription/ManageList";
 import {
   ChainsSettings,
   SupportedChains,
 } from "./constants";
-import { ManageSingle } from "./ManageSingle";
+import { ManageSingle } from "./Subscription/ManageSingle";
 import { All } from "./All";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { SupportedChainIdsType } from "./types";

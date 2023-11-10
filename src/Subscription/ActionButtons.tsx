@@ -81,12 +81,12 @@ export function InsufficientAllowance(props: {
       }),
     };
 
-    await executeTransaction(
+    const success = await executeTransaction(
       txData,
       setIsSendingTx,
       setMessage
     );
-    props.onApproved();
+    if (success) props.onApproved();
   };
 
   return (
@@ -190,12 +190,12 @@ export function StartSubscription(props: {
       };
     }
 
-    await executeTransaction(
+    const success = await executeTransaction(
       txData,
       setIsSendingTx,
       setMessage
     );
-    props.onStarted();
+    if (success) props.onStarted();
   };
 
   return (
@@ -204,6 +204,49 @@ export function StartSubscription(props: {
       {!isSendingTx && (
         <button onClick={onStart}>
           Start subscription
+        </button>
+      )}
+    </div>
+  );
+}
+
+export function TerminateSubscription(props: {
+  chain: SupportedChain;
+  subscriptionHash: string;
+  onTerminated: () => void;
+}) {
+  const [message, setMessage] = useState("");
+  const [isSendingTx, setIsSendingTx] =
+    useState(false);
+
+  const onTerminate = async () => {
+    const chainSettings =
+      ChainsSettings[props.chain.id];
+
+    const txData = {
+      to: chainSettings.routerAddress,
+      value: BigInt(0),
+      data: encodeFunctionData({
+        abi: RouterABI as any,
+        functionName: "terminateSubscription",
+        args: [`0x${props.subscriptionHash}`],
+      }),
+    };
+
+    const success = await executeTransaction(
+      txData,
+      setIsSendingTx,
+      setMessage
+    );
+    if (success) props.onTerminated();
+  };
+
+  return (
+    <div className="verticalFlex">
+      {message && <p>{message}</p>}
+      {!isSendingTx && (
+        <button onClick={onTerminate}>
+          Terminate
         </button>
       )}
     </div>

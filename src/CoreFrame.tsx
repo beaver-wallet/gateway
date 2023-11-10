@@ -12,7 +12,7 @@ export function CoreFrame(props: {
     <div className="rootContainer">
       <p className="title1Font">PayBeaver</p>
       <div className="centralizingContainer">
-        <div className="cardContainer">
+        <div className="cardContainer scrollingCard">
           <div className="cardHeader">
             {props.backPath ? (
               <div

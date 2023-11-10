@@ -2,10 +2,10 @@ import {
   useNavigate,
   useParams,
 } from "react-router-dom";
-import { CoreFrame } from "./CoreFrame";
+import { CoreFrame } from "../CoreFrame";
 import { useEffect, useState } from "react";
-import { Subscription } from "./types";
-import { getSubscriptionsByUser } from "./network";
+import { Subscription } from "../types";
+import { getSubscriptionsByUser } from "../network";
 import { Hex, getAddress } from "viem";
 
 function SingleSubscriptionElement(props: {
@@ -26,26 +26,20 @@ function SingleSubscriptionElement(props: {
     props.subscription.status === "paid" ||
     props.subscription.status === "pending"
   ) {
-    statusText = `Active. Next payment at ${nextPaymentDate.toLocaleString()}`;
+    statusText = `Next payment: ${nextPaymentDate.toDateString()}`;
   } else if (
     props.subscription.status === "expired"
   ) {
     statusText = "Expired.";
-    if (props.subscription.isActive) {
-      statusText += ` Valid until ${nextPaymentDate.toLocaleString()}`;
-    }
   } else if (
     props.subscription.status === "terminated"
   ) {
     statusText = "Terminated.";
-    if (props.subscription.isActive) {
-      statusText += ` Valid until ${nextPaymentDate.toLocaleString()}`;
-    }
   }
 
   return (
     <div
-      className="subscriptionListElement"
+      className="manageListElement"
       onClick={() => {
         navigate(
           "/subscription/" +
@@ -54,18 +48,9 @@ function SingleSubscriptionElement(props: {
       }}
     >
       <p>
-        {props.subscription.product.productName} @{" "}
-        {
-          props.subscription.product
-            .merchantDomain
-        }
+        {props.subscription.product.productName}
       </p>
-      <p>
-        {props.subscription.product.humanAmount}{" "}
-        {props.subscription.product.tokenSymbol} /{" "}
-        {props.subscription.product.periodHuman}
-      </p>
-      <p>{statusText}</p>
+      <p className="minor1Font">{statusText}</p>
     </div>
   );
 }
@@ -90,7 +75,7 @@ export function ManageList() {
       if (!validatedAddress) return;
       const subscriptions =
         await getSubscriptionsByUser(
-          address as Hex
+          validatedAddress
         );
       console.log(
         "subscriptions from the indexer",
@@ -98,11 +83,11 @@ export function ManageList() {
       );
       setSubscriptions(subscriptions);
     })();
-  }, [address]);
+  }, [validatedAddress]);
 
   if (!validatedAddress) {
     return (
-      <CoreFrame title="My subscriptions">
+      <CoreFrame title="Your subscriptions">
         <p>
           Please enter a valid address is in the
           url in format /manage/0x"your-address"
@@ -121,14 +106,17 @@ export function ManageList() {
       ) : subscriptions.length === 0 ? (
         <p>No subscriptions.</p>
       ) : null}
-      {subscriptions?.map(
-        (subscription, index) => (
-          <SingleSubscriptionElement
-            subscription={subscription}
-            key={index}
-          />
-        )
-      )}
+      <div className="verticalFlex">
+        {subscriptions?.map(
+          (subscription, index) => (
+            <SingleSubscriptionElement
+              subscription={subscription}
+              key={index}
+            />
+          )
+        )}
+        <div className="heightFiller" />
+      </div>
     </CoreFrame>
   );
 }

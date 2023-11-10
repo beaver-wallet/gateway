@@ -35,10 +35,8 @@ button:hover {
   background-color: black;
 }
 
-select {
-  /* border: none; */
-  /* width: fit-content; */
-  /* padding: 0px; */
+.underline {
+  text-decoration: underline;
 }
 
 .title1Font {
@@ -81,7 +79,7 @@ select {
   border: 1px solid black;
   display: flex;
   flex-direction: column;
-  gap: 64px;
+  gap: 32px;
   width: 400px;
 }
 
@@ -111,4 +109,21 @@ select {
   flex-grow: 1;
   border-bottom: 2px dotted black;
   margin-bottom: 4px;
+}
+
+.scrollingCard {
+  max-height: 500px;
+  overflow-y: scroll;
+}
+
+.heightFiller {
+  height: 32px;
+}
+
+.manageListElement {
+  padding: 16px;
+}
+
+.manageListElement:hover {
+  border: 1px solid black;
 }

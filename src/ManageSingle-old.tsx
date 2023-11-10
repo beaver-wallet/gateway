@@ -189,7 +189,7 @@ function TerminateButton(props: {
   ];
 }
 
-export function ManageSingle() {
+export function ManageSingleOld() {
   const { subscriptionHash } = useParams();
   const [subscription, setSubscription] =
     useState<Subscription | null>();

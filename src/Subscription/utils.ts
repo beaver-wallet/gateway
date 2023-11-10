@@ -121,7 +121,7 @@ export async function executeTransaction(
   txData: any,
   setIsSendingTx: (isSending: boolean) => void,
   setMessage: (message: string) => void
-) {
+): Promise<boolean> {
   setIsSendingTx(true);
   setMessage("Sign transaction in your wallet.");
   let txHash: Hex;
@@ -134,7 +134,7 @@ export async function executeTransaction(
     console.error("Error while signing", e);
     setIsSendingTx(false);
     setMessage("Error. Please try again.");
-    return;
+    return false;
   }
   setMessage("Waiting for execution...");
   try {
@@ -143,7 +143,9 @@ export async function executeTransaction(
     console.error("Error while executing", e);
     setIsSendingTx(false);
     setMessage("Error. Please try again.");
+    return false;
   }
+  return true;
 }
 
 export function hashProduct(

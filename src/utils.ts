@@ -142,3 +142,13 @@ export function chainInList(
     .map((chain) => chain.id)
     .includes(chain.id as any);
 }
+
+export function capitalize(text: string): string {
+  if (text.length === 0) return "";
+  if (text.length === 1)
+    return text.charAt(0).toUpperCase();
+
+  return (
+    text.charAt(0).toUpperCase() + text.slice(1)
+  );
+}
