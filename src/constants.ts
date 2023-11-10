@@ -37,7 +37,7 @@ if (
   GatewayUrl = "http://localhost:3000";
 } else {
   IndexerUrl = "https://api.paybeaver.xyz";
-  GatewayUrl = "https://gateway.paybeaver.xyz";
+  GatewayUrl = "https://paybeaver.xyz";
 }
 
 export const PaymentPeriod =

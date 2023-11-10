@@ -25,12 +25,13 @@ import {
   getDefaultWallets,
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
+import { Landing } from "./Landing/Landing";
 
 export const metadata = {
   name: "Beaver Subscriptions Gateway",
   description:
     "Beaver Subscriptions Gateway - an easy way to pay for subscriptions with crypto",
-  url: "https://gateway.paybeaver.xyz",
+  url: "https://paybeaver.xyz",
   icons: [
     "https://avatars.githubusercontent.com/u/37784886",
   ],
@@ -66,7 +67,10 @@ function App() {
       <RainbowKitProvider chains={chains}>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route
+              path="/"
+              element={<Landing />}
+            />
             <Route
               path="/subscribe"
               element={<Subscribe />}

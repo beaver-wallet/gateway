@@ -151,6 +151,10 @@ button:hover {
   gap: 8px;
 }
 
+.mediumSpacing {
+  gap: 32px;
+}
+
 .subscriptionLine {
   width: 100%;
   display: flex;
@@ -188,4 +192,14 @@ button:hover {
   /* And if you want the div to be full-width: */
   left: 0;
   right: 0;
+}
+
+.featureHighlight {
+  border-color: black;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 10px;
+  padding: 16px;
+  margin-left: 16px;
+  margin-right: 16px;
 }

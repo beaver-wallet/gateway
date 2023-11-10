@@ -155,7 +155,7 @@ export function CreateShortcut() {
   };
 
   if (shortcutId) {
-    const shortUrl = `https://gateway.paybeaver.xyz/subscribe/${shortcutId}`;
+    const shortUrl = `https://paybeaver.xyz/subscribe/${shortcutId}`;
     return (
       <div
         style={{

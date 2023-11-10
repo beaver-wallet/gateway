@@ -10,7 +10,14 @@ export function CoreFrame(props: {
   const navigate = useNavigate();
   return (
     <div className="rootContainer">
-      <p className="title1Font">PayBeaver</p>
+      <p
+        className="title1Font"
+        onClick={() =>
+          (window.location.href = "/")
+        }
+      >
+        PayBeaver
+      </p>
       <div className="centralizingContainer">
         <div className="cardContainer scrollingCard">
           <div className="cardHeader">
