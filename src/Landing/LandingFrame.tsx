@@ -14,7 +14,6 @@ export function CoreFrame({ children }: any) {
         href="https://docs.paybeaver.xyz/"
         style={{
           display: "block",
-          fontSize: 18,
           textAlign: "right",
         }}
       >
@@ -39,7 +38,6 @@ export function CoreFrame({ children }: any) {
         <a
           href="https://docs.paybeaver.xyz/"
           style={{
-            fontSize: 18,
             marginLeft: 48,
           }}
         >
@@ -55,6 +53,7 @@ export function CoreFrame({ children }: any) {
       style={{
         paddingLeft: onMobile ? 4 : 200,
         paddingRight: onMobile ? 4 : 200,
+        paddingTop: 16,
       }}
     >
       {onMobile ? mobileHeader : desktopHeader}
