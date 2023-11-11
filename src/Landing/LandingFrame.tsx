@@ -32,9 +32,9 @@ export function CoreFrame({ children }: any) {
         }}
       >
         <div />
-        <h1 className="title1Font">
+        <p className="title1Font">
           Beaver Crypto Subscriptions
-        </h1>
+        </p>
         <a
           href="https://docs.paybeaver.xyz/"
           style={{
