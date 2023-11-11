@@ -21,6 +21,11 @@ export const ProductionChains =
     (chain) => !(chain as any).testnet
   );
 
+export const TestnetChains =
+  SupportedChains.filter(
+    (chain) => (chain as any).testnet
+  );
+
 export const SupportedChainIds =
   SupportedChains.map((chain) => chain.id);
 

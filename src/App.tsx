@@ -13,7 +13,9 @@ import { Home } from "./Home";
 import { ManageList } from "./Subscription/ManageList";
 import {
   ChainsSettings,
+  ProductionChains,
   SupportedChains,
+  TestnetChains,
 } from "./constants";
 import { ManageSingle } from "./Subscription/ManageSingle";
 import { All } from "./All";
@@ -102,7 +104,19 @@ function App() {
             />
             <Route
               path="/create"
-              element={<CreatePrompt />}
+              element={
+                <CreatePrompt
+                  chains={ProductionChains}
+                />
+              }
+            />
+            <Route
+              path="/create-testnet"
+              element={
+                <CreatePrompt
+                  chains={TestnetChains}
+                />
+              }
             />
             <Route
               path="/create/:promptId"

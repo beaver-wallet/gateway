@@ -1,8 +1,5 @@
 import { useState } from "react";
-import {
-  ChainsSettings,
-  ProductionChains,
-} from "./constants";
+import { ChainsSettings } from "./constants";
 import {
   SupportedChain,
   SupportedChainIdsType,
@@ -20,7 +17,9 @@ import {
 const AmountRegexp = /^\d+(\.\d+)?$/;
 const PeriodRegexp = /^\d+d$/;
 
-export function CreatePrompt() {
+export function CreatePrompt(props: {
+  chains: SupportedChain[];
+}) {
   const [merchantDomain, setMerchantDomain] =
     useState("");
   const [productName, setProductName] =
@@ -219,7 +218,7 @@ export function CreatePrompt() {
               Select a token
             </option>
             {getAvailableTokensSymbols(
-              ProductionChains
+              props.chains
             ).map((tokenSymbol) => (
               <option
                 value={tokenSymbol}
@@ -266,7 +265,7 @@ export function CreatePrompt() {
             Some blockchains may be unavailable
             depending on the selected token.
           </p>
-          {ProductionChains.map((chain) => (
+          {props.chains.map((chain) => (
             <div key={chain.id}>
               <input
                 type="checkbox"
