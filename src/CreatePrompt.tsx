@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   ChainsSettings,
-  GatewayUrl,
   ProductionChains,
 } from "./constants";
 import {
@@ -11,6 +10,7 @@ import {
 import {
   makePromptRemotely,
   resolveDomainToAddress,
+  saveMetadataRemotely,
 } from "./network";
 import {
   chainToNormalizedName,
@@ -110,6 +110,12 @@ export function CreatePrompt() {
           ChainsSettings[chainId].chain
         )
     );
+    const subscriptionIdToSave =
+      subscriptionId.length === 0
+        ? null
+        : subscriptionId;
+    const userIdToSave =
+      userId.length === 0 ? null : userId;
     const promptId = await makePromptRemotely({
       domain: merchantDomain,
       product: productName,
@@ -125,16 +131,25 @@ export function CreatePrompt() {
         onSuccessUrl.length === 0
           ? null
           : onSuccessUrl,
-      subscriptionId:
-        subscriptionId.length === 0
-          ? null
-          : subscriptionId,
-      userId: userId.length === 0 ? null : userId,
+      subscriptionId: subscriptionIdToSave,
+      userId: userIdToSave,
     });
     console.log(
       "Generated a prompt id.",
       promptId
     );
+
+    // Cache metadata on the server. Makes the checkout form loading faster.
+    await saveMetadataRemotely({
+      merchantDomain,
+      productName,
+    });
+
+    await saveMetadataRemotely({
+      subscriptionId: subscriptionIdToSave,
+      userId: userIdToSave,
+    });
+
     window.location.href = `/create/${promptId}`;
   };
 
@@ -246,10 +261,11 @@ export function CreatePrompt() {
         <div>
           <p>
             Blockchains to accept payments on.
+          </p>
+          <p>
             Some blockchains may be unavailable
             depending on the selected token.
           </p>
-
           {ProductionChains.map((chain) => (
             <div key={chain.id}>
               <input
@@ -367,7 +383,9 @@ export function CreatePrompt() {
           disabled={loading}
           className="mediumButton"
         >
-          Create a link!
+          {loading
+            ? "Creating..."
+            : "Create a link!"}
         </button>
       </div>
       <div style={{ height: 200 }} />

@@ -94,14 +94,14 @@ function ActionSection(props: {
 
       const balance = await queryCurrentBalance(
         props.userData.validChain,
-        "USDT",
+        props.prompt!.tokenSymbol,
         props.userData.address
       );
 
       const allowance =
         await queryCurrentAllowance(
           props.userData.validChain,
-          "USDT",
+          props.prompt!.tokenSymbol,
           props.userData.address
         );
 
@@ -109,7 +109,7 @@ function ActionSection(props: {
         humanBalance: balance,
         humanAllowance: allowance,
       });
-    }, [props.userData]);
+    }, [props.prompt, props.userData]);
 
   const onApproved = async () => {
     await updateFinancials();
@@ -289,6 +289,17 @@ export function Subscribe() {
             }
           />
         )}
+        {prompt &&
+          prompt.freeTrialLengthSeconds > 0 && (
+            <SubscriptionLine
+              title="Free Trial"
+              value={
+                <p>
+                  {prompt.freeTrialLengthHuman}
+                </p>
+              }
+            />
+          )}
         {userData && (
           <SubscriptionLine
             title="Wallet"
