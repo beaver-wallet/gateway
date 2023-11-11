@@ -269,13 +269,13 @@ export async function queryProductExistsOnChain(
   return hexToNumber(result.data) !== 0;
 }
 
-export async function makeShortcutRemotely(
-  shortcuted: ShortcutPrompt
+export async function makePromptRemotely(
+  prompt: ShortcutPrompt
 ): Promise<string> {
   const response = await fetch(
     `${IndexerUrl}/shortcut`,
     {
-      body: JSON.stringify(shortcuted),
+      body: JSON.stringify(prompt),
       method: "POST",
     }
   );
@@ -284,11 +284,11 @@ export async function makeShortcutRemotely(
   return result.replaceAll('"', ""); // remove quotes
 }
 
-export async function getShortcutPrompt(
-  shortcutId: string
+export async function getPromptRemotely(
+  promptId: string
 ): Promise<ShortcutPrompt | null> {
   const response = await fetch(
-    `${IndexerUrl}/shortcut/${shortcutId}`
+    `${IndexerUrl}/shortcut/${promptId}`
   );
   if (response.status !== 200) return null;
   return (await response.json()) as ShortcutPrompt;

@@ -19,13 +19,14 @@ import { ManageSingle } from "./Subscription/ManageSingle";
 import { All } from "./All";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { SupportedChainIdsType } from "./types";
-import { CreateShortcut } from "./CreateShortcut";
+import { CreatePrompt } from "./CreatePrompt";
 import "@rainbow-me/rainbowkit/styles.css";
 import {
   getDefaultWallets,
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
 import { Landing } from "./Landing/Landing";
+import { PromptCreated } from "./PromptCreated";
 
 export const metadata = {
   name: "Beaver Subscriptions Gateway",
@@ -100,8 +101,12 @@ function App() {
               element={<All />}
             />
             <Route
-              path="/shortcut"
-              element={<CreateShortcut />}
+              path="/create"
+              element={<CreatePrompt />}
+            />
+            <Route
+              path="/create/:promptId"
+              element={<PromptCreated />}
             />
           </Routes>
         </BrowserRouter>

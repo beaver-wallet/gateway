@@ -5,7 +5,7 @@ import {
   keccak256,
 } from "viem";
 import {
-  getShortcutPrompt,
+  getPromptRemotely,
   resolveDomainToAddress,
   saveMetadataRemotely,
 } from "../network";
@@ -39,7 +39,7 @@ export async function resolvePrompt(
   searchParams: URLSearchParams,
   shortcutId: string
 ): Promise<SubscriptionPrompt> {
-  const prompt = await getShortcutPrompt(
+  const prompt = await getPromptRemotely(
     shortcutId
   );
   if (!prompt) {

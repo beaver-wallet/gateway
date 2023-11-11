@@ -5,7 +5,11 @@
       format("truetype");
 }
 
-* {
+p,
+a,
+button,
+input,
+select {
   font-family: OxygenMono;
   color: black;
   font-size: 16px;
@@ -14,6 +18,8 @@
 
 input {
   padding: 4px;
+  border: none;
+  border-bottom: 1px solid black;
 }
 
 a {
@@ -202,4 +208,15 @@ button:hover {
   padding: 16px;
   margin-left: 16px;
   margin-right: 16px;
+}
+
+.promptFormContainer input {
+  width: 300px;
+}
+
+.promptFormContainer {
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
 }
