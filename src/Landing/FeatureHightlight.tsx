@@ -17,7 +17,7 @@ export function FeatureHighlight(props: {
           marginBottom: 16,
         }}
       >
-        {<props.icon size={onMobile ? 32 : 48} />}
+        {<props.icon style={{ width: onMobile ? '20vw' : '10vw', height: onMobile ? '20vw' : '10vw' }} />}
       </div>
       <p>{props.text}</p>
     </div>
